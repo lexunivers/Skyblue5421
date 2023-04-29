@@ -10,17 +10,11 @@ use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
-use App\Entity\Parametres;
- 
+use App\Entity\Parametres; 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
-//use Sonata\CoreBundle\Form\Type\DatePickerType;
-//use Sonata\CoreBundle\Form\Type\DateTimePickerType;
-
 use Sonata\Form\Type\DatePickerType;
 use Sonata\Form\Type\DateTimePickerType;
-
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -36,6 +30,17 @@ class ParametresController extends CRUDController
         ]);
     }
 
+    private function getConfigData() {
+        //$em = $this->container->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager(); 
+    
+        $config = $em->getRepository(Parametres::class)->findAll();
+        $data=[];
+        foreach($config as $c){
+            $data[$c->getClef()]=$c->getValeur();
+        }
+        return $data;
+    }    
 
     public function preList(Request $request): ?Response
     {
@@ -50,7 +55,7 @@ class ParametresController extends CRUDController
         $request =$this->container->get('request_stack')->getCurrentRequest();
         $locale = $this->container->get('request_stack')->getCurrentRequest()->getLocale();
          
-        //$data = $this->getConfigData();
+        $data = $this->getConfigData();
         
          
         $formBuilder = $this->createFormBuilder(null, [
@@ -78,7 +83,7 @@ class ParametresController extends CRUDController
         $form->handleRequest($request);
          
         if ($form->isSubmitted() && $form->isValid()) {
-            $formData = $this->getRequest()->request->get('form');
+           // $formData = $this->getRequest()->request->get('form');
             $ParametresRepositoty = $this->container->get('doctrine.orm.entity_manager')->getRepository(Parametres::class);
             $ParametresRepositoty->updateConfig('offre_date_debut', date("Y-m-d", $this->parseDate($formData['offre_date_debut'],$locale)) );
             $ParametresRepositoty->updateConfig('offre_date_fin',date("Y-m-d",$this->parseDate($formData['offre_date_fin'],$locale)));
@@ -90,5 +95,37 @@ class ParametresController extends CRUDController
             'form' => $form->createView()        
         ]);
     }
-    //return null;
+
+    public function formValidate($data, ExecutionContextInterface $context) {
+        //$request->getSession();     
+        //$data = $this->getRequest()->request->get('form');
+        //$data = $request->getSession()->get('form');
+        //$locale = $this->getRequest()->getLocale();
+         
+        if (isset($data['offre_date_debut'])) {
+            $offre_date_debut = $this->parseDate($data['offre_date_debut'], $locale);
+            $offre_date_debut = new \DateTime("@$offre_date_debut");
+        }
+        if (isset($data['offre_date_fin'])) {
+            $offre_date_fin = $this->parseDate($data['offre_date_fin'], $locale);
+            $offre_date_fin = new \DateTime("@$offre_date_fin");
+        }
+    }
+     
+     
+    public function parseDate($date, $locale, $format = 'dd LLL. y') {
+        $fmt = \IntlDateFormatter::create(
+            $locale,
+            \IntlDateFormatter::FULL,
+            \IntlDateFormatter::FULL,
+            'Etc/UTC',
+            \IntlDateFormatter::GREGORIAN,
+            $format
+            );
+        if (isset($date)) {
+            $parse_date = $fmt->parse($date);
+            return $parse_date;
+        }
+        return null;
+    }
 }

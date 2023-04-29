@@ -38,7 +38,7 @@ class ReservationAdminController extends Controller
     #[Route('/reservation/admin', name: 'app_reservation_admin')]
     public function index(): Response
     {
-        return $this->render('reservation_admin/index1.html.twig', [
+        return $this->render('reservation_admin/index.html.twig', [
             'controller_name' => 'ReservationAdminController',
         ]);
     }
@@ -95,7 +95,9 @@ class ReservationAdminController extends Controller
                 $_SESSION['instructeur'] = $instructeur;            
 			}
 
-        return $this->render('reservation_admin/index.html.twig', [
+           // return $this->redirectToRoute('reservation_index')//; // cast $entity to string
+        
+            return $this->render('reservation_admin/index.html.twig', [
             'form' => $form->createView(),             
             ])
         ;

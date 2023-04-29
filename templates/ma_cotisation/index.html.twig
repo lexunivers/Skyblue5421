@@ -3,56 +3,15 @@
 {% block title %}Cotisation Annuelle Club !{% endblock %}
 
 {% block body %}
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-        {% endblock %}
- <style>
-      hr{
-        height: 5px;
-        background-color: #194a8d;
-        border: none;
-      }
+
+		{% include "_partials/_entete.html.twig" %}        
+          {#}  {{ encore_entry_link_tags('app') }}#}
+		{#<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">#}
+		{#<link href="{{ asset('css/layout.css') }}" rel='stylesheet' />#}
+        
+
 </style>
-<div class="container">	
-<br>
-      <div class="row">
-        <div class="col-lg-6">
-          <div class="card mb-4">
-            <div class="card-body bg-primary text-white text-left">
-              <h5>Compte de : {{app.user.firstname}} {{app.user.lastname}}</h5> 
-              <h5>N° Pilote : {{app.user.id}} </h5>					
-              <h5>N°Comptable : {{app.user.comptepilote.id}}</h5>					
-            </div>
-          </div>
-        </div>		
-      
-        <div class="col-lg-6">
-          <div class="card mb-6">
-              <div class="card-body bg-primary text-white text-center">
-                    {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
-                      <h6>Connecté en tant que: {{ app.user }}</h6>
-                      <hr> 
-                      <a button class="btn btn-outline-success" role="button" href="{{ path('app_logout') }}">Déconnexion</a>
-                    	<a href="{{ path('sky_user_mesdossiers') }}" class="btn btn-outline-success" role="button" aria-pressed="true">Mes Dossiers</a>	
-                    {% endif %}									
-              </div>    
-          </div>  
-        </div>
-	    </div>        
-<hr>		
-            
-                    <div class="row">
-                        <div><h5>{# On affiche tous les messages flash dont le nom est « notice » #}
-                                        
-                            {% for message in app.session.flashbag.get('notice') %}
-                                <div class="alert alert-danger">
-                                    <p>Message : {{ message }}</p>
-                                </div>
-                          {% endfor %}
-                            </h5>
-                        </div>
-                    </div>
+
                     
 
 <br />
@@ -107,7 +66,7 @@
     
    {# {% else %}#}
     <a button class="btn btn-success" role="button" aria-pressed="true" href="{{ path('ma_cotisation_new') }}">Souscrire</a>
-    <a button class="btn btn-primary" role="button" aria-pressed="true" href="{{ path('sky_user_mesdossiers') }}">Mes Dossiers</a>        
+    <a button class="btn btn-primary" role="button" aria-pressed="true" href="{{ path('app_MesDossiers') }}">Mes Dossiers</a>        
 
    {# {% endif %}#}
 {% endblock %}	

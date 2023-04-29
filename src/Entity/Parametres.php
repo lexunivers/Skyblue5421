@@ -8,10 +8,11 @@ use Doctrine\ORM\Mapping as ORM;
 
 //#[ORM\Entity(repositoryClass: ParametresRepository::class)]
 
-
 /**
+ * @ORM\Table(name="parametres", indexes={@ORM\Index(name="clef", columns={"clef"})})
  * @ORM\Entity(repositoryClass=ParametresRepository::class)
  */
+
 class Parametres
 {
     /**
@@ -22,14 +23,14 @@ class Parametres
     private $id;
 
 
-    //#[ORM\Column(length: 255)]
+
     
 	/**
      * @var string
-     * @ORM\Column(name="cle", type="string", length=255, nullable=false)
+     * @ORM\Column(name="clef", type="string", length=255, nullable=false)
      */
 
-    private $cle;
+    private $clef;
 
 
 //    #[ORM\Column(type: Types::TEXT)]
@@ -53,39 +54,39 @@ class Parametres
         return $this->id;
     }
 
-    public function getCle(): ?string
+    public function getClef(): ?string
     {
-        return $this->cle;
+        return $this->clef;
     }
 
-    public function setCle(string $cle): self
+    public function setClef(string $clef): self
     {
-        $this->cle = $cle;
+        $this->cle = $clef;
 
         return $this;
     }
-
+        
     public function getValeur(): ?string
     {
-        return $this->valeur;
+        return unserialize($this->valeur);
     }
-
-    public function setValeur(string $valeur): self
+     
+    public function setValeur(?string $valeur): self
     {
-        $this->valeur = $valeur;
-
+        $this->valeur = serialize($valeur);
+     
         return $this;
     }
-
-    public function getUpdateAt(): ?\DateTime
+     
+    public function getUpdatedAt(): ?string
     {
-        return $this->update_at;
+        return $this->updatedAt;
     }
-
-    public function setUpdateAt(\DateTime $update_at): self
+     
+    public function setUpdatedAt(?string $updatedAt): self
     {
-        $this->update_at = $update_at;
-
+        $this->updatedAt = $updatedAt;
+     
         return $this;
-    }
+    }    
 }
