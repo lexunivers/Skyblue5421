@@ -1,25 +1,35 @@
+{% form_theme form 'bootstrap_4_layout.html.twig' %}	
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
 {{ form_start(form) }}
 <div class="row">
 	<div class="col">
-	{{ form_row(form.user, {'label' : 'Adhérent : ', 'attr' : { 'class' : 'user' }} ) }}
+		<div class="form-group" id="user">
+		<strong>{{ form_row(form.user, {'label' : 'Adhérent : ', 'attr' : { 'class' : 'user' }} ) }}</strong>
+		</div>
 	</div>
 </div>
 
 {#	{{ form_widget(form.statut, {'label' : 'Statut', 'attr': {'class': 'cotisationclub' }} ) }}	#}
 
 <div class="row">
+
 	<div class="input-field col s12 m12 l12">
-	
+
+		<div class="form-group" id="statut">	
 	{% if validation == true %}	
-		{{ form_row(form.statut, {'label' : 'Statut : ', 'attr' : { 'class' : 'CotisationClub' }} ) }}
+		<strong>{{ form_row(form.statut, {'label' : 'Statut : ', 'attr' : { 'class' : 'CotisationClub' }} ) }}</strong>
 	{% else %}
 			<li><em>Pas de validation</em></li>
-	{% endif %}	
+	{% endif %}
+		</div>	
 	</div>
 </div>	
 <div class="row">
 		<div class="input-field col s12 m6 l6">
-		{{ form_row(form.InfoPilote, {'label' : 'InfoPilote : ', 'attr' : { 'class' : 'CotisationClub' }} ) }}
+			<div class="form-group" id="infoPilote">		
+				<strong>{{ form_row(form.InfoPilote, {'label' : 'InfoPilote : ', 'attr' : { 'class' : 'CotisationClub' }} ) }}</strong>
+			</div>
 		</div>
 </div>
     {# {{ form_widget(form) }} #}

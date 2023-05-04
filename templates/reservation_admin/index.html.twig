@@ -250,7 +250,7 @@
 			{% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
 				<h6>Adhérent Connecté: {{ app.user }}</h6>		 
 
-				<a class="btn btn-info text-center" href="{{ path('reserver_add') }}">Réservation Formulaire classique</a>
+				<a class="btn btn-info text-center" href="#">Réservation Formulaire classique</a>
 				<a button class="btn btn-outline-primary" role="button" href="{{ path('app_logout') }}">Déconnexion</a> 		
 				<a class="btn btn-outline-primary" href="/admin/dashboard"  role="button" aria-pressed="true">Retour Tableau de Bord</a>			
 			

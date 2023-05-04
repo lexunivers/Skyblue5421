@@ -55,22 +55,17 @@ class MaCotisationController extends AbstractController
 		
         $em = $this->getDoctrine()->getManager();
 
-		$annee = $em->getRepository('App\Entity\CotisationClub')->myfindAnnee();//findBy(['annee'=>$annee], ['id' => 'ASC'],  2,
-					//0);// myfindAnnee($annee);
-        
-       // var_dump($annee);
-        //$annee = $annee;    
+		$annee = $em->getRepository('App\Entity\CotisationClub')->myfindAnnee();
+          
 		$listeCotisation = $em->getRepository('App\Entity\MaCotisation')->findBy(array('user' => $user));
-       // $maCotisation->setAnnee($annee);//$annuel);
 
         $annee = $session->get('annee');
-//        echo"la session Annee est de : C:\wamp64\www\skyblue5421\src\Controller\MaCotisationController.php ". $annee;
 
             foreach($listeCotisation as $cotisation)
             {        
 				if ('userId_exists' == true && 'annuel_exists'== true){
 
-				return $this->redirectToRoute('ma_cotisation_Afficher',['id' => $cotisation->getId()]);//, 'annee' => $cotisation->getAnnee(['validation' => true]) ] );
+				return $this->redirectToRoute('ma_cotisation_Afficher',['id' => $cotisation->getId()]);
 					}				
             }
 
