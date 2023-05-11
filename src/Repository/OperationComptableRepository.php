@@ -43,6 +43,28 @@ class OperationComptableRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findBySommeTotaleRecette()
+    {
+        return $this->createQueryBuilder('o')
+            ->select('SUM(o.OperMontant)')
+            ->Where('o.OperSensMt = 0 ')
+            //->GROUPBY('O.OperSensMt')
+            ->getQuery()
+            ->getResult()
+        ;
+        }
+
+        public function findBySommeTotaleCredit()
+        {
+            return $this->createQueryBuilder('o')
+                ->select('SUM(o.OperMontant)')
+                ->Where('o.OperSensMt = 1 ')
+                //->GROUPBY('O.OperSensMt')
+                ->getQuery()
+                ->getResult()
+            ;
+            }
+
     public function myFindTotale($CompteId)
     {
         return $this->createQueryBuilder('O')

@@ -39,6 +39,22 @@ class ReservationRepository extends ServiceEntityRepository
         }
     }
 
+    /*
+    * returns number of "reservation" per day
+    */
+    public function countByDate()
+    {
+        return $this->createQueryBuilder('r')
+            ->select('SUBSTRING(r.start, 1, 10) as jour, count(r) as nombre ')
+            //->select('count(r), nombre')
+            ->groupBy('jour')
+            ->getQuery()
+            ->getResult()
+        ;
+   // SELECT count(*), SUBSTRING(start, 1, 10) as depart From reservation Group By SUBSTRING(start, 1, 10); 
+
+    }
+
 //    /**
 //     * @return Reservation[] Returns an array of Reservation objects
 //     */

@@ -5,19 +5,13 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
 use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
 use App\Entity\Statistiques;
- 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
-//use Sonata\Form\Type\DatePickerType;
-//use Sonata\Form\Type\DateTimePickerType;
-
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -33,44 +27,43 @@ class StatistiquesController extends CRUDController
             throw new AccessDeniedException();
         }
 
-//    /**
-//     * @Route("/stats", name="stats")
-//     */
-//   public function statistiques(CategoriesRepository $categRepo, AnnoncesRepository $annRepo){
-        // On va chercher toutes les catégories
+        // A - On va chercher toutes les Users
         $em = $this->getDoctrine()->getManager();
-        $User = $em->getRepository('App\Entity\User')->findAll();         
-        //$Users = $UserRepository->findAll();
+        $Users = $em->getRepository('App\Entity\User')->findAll();
 
-        $categNom = [];
-        $categColor = [];
-        $categCount = [];
+       // $Compta = $em->getRepository('App\Entity\OperationComptable')->findBySommeTotaleRecette();
 
-        // On "démonte" les données pour les séparer tel qu'attendu par ChartJS
-        foreach($User as $User){
-            $categNom[] = $User->getUsername();
+      
+        // A - 1 On "démonte" les données pour les séparer tel qu'attendu par ChartJS		
+        $UserNom = [];
+        $UserColor = [];
+        $UserCount = [];		
+		
+        foreach($Users as $User){
+            $UserNom[] = $User->getFirstname();
            // $categColor[] = $User->getColor();
-            //$categCount[] = count($User->getFirstname());
+           // $UserCount[] = count(is_countable($User)?$UserNom:[]);
+            $UserCount[] = count(array($User));
         }
 
-        // On va chercher le nombre d'annonces publiées par date
-        //$annonces = $annRepo->countByDate();
+        // B - On va chercher le nombre de reservation par date
+			$reservations = $em->getRepository('App\Entity\Reservation')->countByDate();
 
-       // $dates = [];
-        //$annoncesCount = [];
+			// B - 1 On "démonte" les données pour les séparer tel qu'attendu par ChartJS
+			$dates = [];
+			$reservationsCount = []; 
 
-        // On "démonte" les données pour les séparer tel qu'attendu par ChartJS
-        //foreach($annonces as $annonce){
-        //    $dates[] = $annonce['dateAnnonces'];
-        //    $annoncesCount[] = $annonce['count'];
-        //}
+			foreach($reservations as $reservation){
+				$dates[] = $reservation['jour'];
+				$reservationsCount[] = $reservation['nombre'] ;
+			}
 
         return $this->render('Statistiques/index.html.twig', [
-            'categNom' => json_encode($categNom),
-            'categColor' => json_encode($categColor),
-            'categCount' => json_encode($categCount),
-           // 'dates' => json_encode($dates),
-           // 'annoncesCount' => json_encode($annoncesCount),
+            'UserNom' => json_encode($UserNom),
+            'UserColor' => json_encode($UserColor),
+            'UserCount' => json_encode($UserCount),
+            'dates' => json_encode($dates),
+            'reservationsCount' => json_encode($reservationsCount),
         ])
         ;
 
