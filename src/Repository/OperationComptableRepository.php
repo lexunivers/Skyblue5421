@@ -46,7 +46,7 @@ class OperationComptableRepository extends ServiceEntityRepository
     public function findBySommeTotaleRecette()
     {
         return $this->createQueryBuilder('o')
-            ->select('SUM(o.OperMontant)')
+            ->select('SUM(o.OperMontant) as total')
             ->Where('o.OperSensMt = 0 ')
             //->GROUPBY('O.OperSensMt')
             ->getQuery()
@@ -54,12 +54,33 @@ class OperationComptableRepository extends ServiceEntityRepository
         ;
         }
 
+    public function findByRecetteCB() {
+        return $this->createQueryBuilder('o')
+            ->select('SUBSTRING(o.OperDate, 1, 10) as jour, SUM(o.OperMontant) as total, count(o) as nombre ')
+            ->where('o.OperSensMt = 1')
+            ->groupBy('jour')
+            ->getQuery()
+            ->getResult()
+        ;        
+    }    
+
+    public function findByCptesDebiteurs() {
+        return $this->createQueryBuilder('o')
+            ->select('SUBSTRING(o.OperDate, 1, 10) as jour, SUM(o.OperMontant) as total, count(o) as nombre ')
+            ->where('o.OperSensMt = 0')
+            ->groupBy('jour')
+            ->getQuery()
+            ->getResult()
+        ;        
+    }  
+    //SELECT count(*), SUBSTRING(oper_date, 1, 10) as jour, SUM(Oper_Montant) as total From operation_comptable WHERE oper_sens_mt = 1 Group By SUBSTRING(oper_date, 1, 10); 
+
         public function findBySommeTotaleCredit()
         {
             return $this->createQueryBuilder('o')
-                ->select('SUM(o.OperMontant)')
-                ->Where('o.OperSensMt = 1 ')
-                //->GROUPBY('O.OperSensMt')
+            ->select('SUM(o.OperMontant) as total')
+            ->where('o.OperSensMt = 1')
+            //->groupBy('jour')
                 ->getQuery()
                 ->getResult()
             ;
