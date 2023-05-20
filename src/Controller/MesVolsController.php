@@ -48,7 +48,7 @@ class MesVolsController extends AbstractController
            // $request->getSession()->getFlashBag()->add('success', 'Le Vol a bien été enregistré.');
             return $this->redirect($this->generateUrl('app_MesVols_confirmer', ['id' => $vol->getId(), 'avion' => $vol->getAvion('id'), 'Heuresdevol' => $vol->DureeDuVol() ]));
         }        
-        return $this->render('/MesVols/new_saisir_Un_Vol.html.twig', [
+        return $this->render('/MesVols/saisir_Un_Vol.html.twig', [
             'formVol'    => $form->createView(),
             'editMode' => $vol->getId() !== null,
             ]);

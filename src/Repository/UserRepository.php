@@ -39,6 +39,16 @@ class UserRepository extends ServiceEntityRepository
         }
     }
 
+    /*
+    /* récupérer des utilisateurs en fonction de la date de connexion
+    */
+    public function findUsersDateConnexion(){
+        $query = $this->createQueryBuilder('user')
+                      ->select('u.last_login', "connexion")
+                      ->where("TIMESTAMPDIFF(MONTH, MAX(connexion.dateConnexion), CURRENT_DATE()) >= 36");
+        return $query->getQuery()->getResult();
+}
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

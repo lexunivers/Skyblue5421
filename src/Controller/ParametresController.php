@@ -56,7 +56,11 @@ class ParametresController extends CRUDController
         $locale = $this->container->get('request_stack')->getCurrentRequest()->getLocale();
          
         $data = $this->getConfigData();
-        
+        echo"REQUETE";
+      //  var_dump($request);
+        echo"Locale";
+        //var_dump($locale);
+        //exit;
          
         $formBuilder = $this->createFormBuilder(null, [
             'constraints' => [new Callback([$this, 'formValidate'])]
@@ -81,25 +85,33 @@ class ParametresController extends CRUDController
  
         $form = $formBuilder->getForm();
         $form->handleRequest($request);
-         
+        
+       // echo"form";
+       // var_dump($form);
+
         if ($form->isSubmitted() && $form->isValid()) {
            // $formData = $this->getRequest()->request->get('form');
-            $ParametresRepositoty = $this->container->get('doctrine.orm.entity_manager')->getRepository(Parametres::class);
+           $em = $this->getDoctrine()->getManager(); 
+            $ParametresRepositoty = $em->getRepository(Parametres::class);//container->get('doctrine.orm.entity_manager')->getRepository(Parametres::class);
             $ParametresRepositoty->updateConfig('offre_date_debut', date("Y-m-d", $this->parseDate($formData['offre_date_debut'],$locale)) );
             $ParametresRepositoty->updateConfig('offre_date_fin',date("Y-m-d",$this->parseDate($formData['offre_date_fin'],$locale)));
             $this->addFlash('success', $this->get('translator')->trans('Parametres sauvegardés.'));
-        }        
-
+        }
+       // echo"formData";        
+       // var_dump($form = $formBuilder->getForm());
+       // exit;
+    //   dd($form);
         return $this->render('Admin/parametres/listAction.html.twig', [
             'controller_name' => 'ParametresController',
             'form' => $form->createView()        
         ]);
     }
 
+
     public function formValidate($data, ExecutionContextInterface $context) {
         //$request->getSession();     
         //$data = $this->getRequest()->request->get('form');
-        //$data = $request->getSession()->get('form');
+        $data = $request->getSession()->get('form');
         //$locale = $this->getRequest()->getLocale();
          
         if (isset($data['offre_date_debut'])) {
@@ -110,6 +122,8 @@ class ParametresController extends CRUDController
             $offre_date_fin = $this->parseDate($data['offre_date_fin'], $locale);
             $offre_date_fin = new \DateTime("@$offre_date_fin");
         }
+    dd($offre_date_fin);
+    
     }
      
      

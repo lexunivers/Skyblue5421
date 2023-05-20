@@ -17,6 +17,7 @@ class ReservationEditType extends AbstractType
             ->remove('start')
             ->remove('end')
             ->remove('title')
+            ->remove('appareil')
             //->add('reservataire')
             ->add('instructeur', null, array('placeholder' => 'Vol Solo',
 											'empty_data' => 'Default value'))

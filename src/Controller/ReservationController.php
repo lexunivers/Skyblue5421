@@ -25,8 +25,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Serializer\SerializerInterface;
-
-
+use DoctrineExtensions\Query\Mysql;
+use Doctrine\ORM;
 
 class ReservationController extends AbstractController
 {
@@ -163,8 +163,7 @@ class ReservationController extends AbstractController
             }else{
 
                // $em = $this->getDoctrine()->getManager();
-                $formateur = $em->getRepository('App\Entity\Instructeur')->myfindNom($instructeur);
-               // $instructeur = $_SESSION['instructeur'];              		
+                $formateur = $em->getRepository('App\Entity\Instructeur')->myfindNom($instructeur);              		
 				$initiale = $em->getRepository('App\Entity\Instructeur')->myfindInitiales($instructeur);				
                 $appareil = $em->getRepository('App\Entity\Resources')->myfindAvion($resourceId);
 
@@ -182,7 +181,7 @@ class ReservationController extends AbstractController
                 $nom = implode(":", $value2);                 
                 $reservation->setFormateur($nom);
 
-                // - 3 - On renseigne l'attribut 'Initiales'
+                // - 3 - On renseigne l'attribut 'Initiales' Instructeur
                 foreach ($initiale as $value3) {
 					$value3;
 				};
@@ -190,7 +189,10 @@ class ReservationController extends AbstractController
 				$title	= $user." / ".$value3;              
 				$reservation->setTitle($title);
 			}
-
+                // - 4 - on attribue code Reservation
+                $CodeReservation = rand(0,10000);
+                //echo"code".$CodeReservation;
+                //exit;
 
 			$form = $this->createForm(ReservationEditType::class, $reservation);
 			$form->handleRequest($request);
@@ -199,7 +201,8 @@ class ReservationController extends AbstractController
             $reservation->setEnd(new \DateTime($end) );
             $reservation->setResourceId($resourceId);
             $reservation->setReservataire($auteur );
-            
+            $reservation->setCodeReservation($CodeReservation);
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($reservation);
             $entityManager->flush();
@@ -301,5 +304,73 @@ class ReservationController extends AbstractController
         //return $this->render('reserver/index.html.twig');
         //return $this->redirectToRoute('reserver_index');
     }
-    
+
+    //<------------------------------------------------------------->
+    //<-- partie hors requête Ajax de index.html.twig -->
+    //<-- Utilisé pour le formulaire classique de réservation -->
+        
+    /**
+     * @Route("/ajout", name="reservation_ajout", methods={"GET","POST"})
+     */
+    public function ajout(Request $request): Response
+    {
+ 
+		// attributs de session
+        $session = $this->get("session");
+        $auteur = $this->getUser('session')->getId();
+        $user = $this->getUser('session')->getUsername();
+
+        // On instancie une nouvelle reservation
+        $reservation = new Reservation();
+                        // - 4 - on attribue code Reservation
+        $CodeReservation = rand(0,10000);
+        //echo"code".$CodeReservation;
+        //exit;
+        
+        $form = $this->createForm(ReservationType::class, $reservation);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+        $session = $this->get("session");
+        $auteur = $this->getUser('session')->getId();
+        $user = $this->getUser('session')->getUsername();
+		$instructeur = $reservation->getInstructeur();
+		$resourceId = $reservation->getResourceId();
+        
+        $em = $this->getDoctrine()->getManager(); 
+
+			if ($instructeur == true){
+				$initiale = $reservation->getInstructeur()->getInitiales();
+				$title	= $user." / ".$initiale;
+				$reservation->setTitle($title);
+                $reservation->setFormateur($reservation->getInstructeur() );
+			}else{			
+			$reservation->setTitle($user);
+            $reservation->setFormateur("Néant");
+			}
+
+        $reservation->setCodeReservation($CodeReservation);			
+		$reservation->setReservataire($auteur);
+		$reservation->SetResourceId($reservation->getAvion()->getAvion()->getId());
+		$reservation->setInstructeur($reservation->getInstructeur() );
+            $title = $reservation->getAvion()->getAvion()->getTitle();	
+            $immat = $reservation->getAvion()->getAvion()->getType();
+            $identif = $immat."-".$title;        
+        $reservation->SetAppareil($identif);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($reservation);
+        $entityManager->flush();
+
+            return $this->redirectToRoute('reservation_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('reserver/new.html.twig', [
+            'reservation' => $reservation,
+            'form' => $form->createView(),
+        ]);
+
+    }
+
 }
+

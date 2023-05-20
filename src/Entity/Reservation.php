@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ReservationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
 
@@ -78,6 +80,42 @@ class Reservation
      * @ORM\Column(name="formateur", type="string", length=255)
      */
     private $formateur;
+
+    /**
+    * @var \Avion
+    * @ORM\ManyToOne(targetEntity="Avions")
+    * @ORM\JoinColumns({
+    *   @ORM\JoinColumn(name="Avion", referencedColumnName="id")
+    * })
+    */
+    private $avion;
+
+    public function getAvion(): ?Avions
+    {
+        return $this->avion;
+    }
+    
+    public function setAvion(?Avions $avion): self
+    {
+        $this->avion = $avion;
+    
+        return $this;
+    }    
+
+    /**
+     * @ORM\Column(type="string", length=5)
+     */
+    private $CodeReservation;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Vol::class, mappedBy="codereservation")
+     */
+    private $vols;
+
+    public function __construct()
+    {
+        $this->vols = new ArrayCollection();
+    }
 
     
     public function getStart(): ?\DateTimeInterface
@@ -199,5 +237,19 @@ class Reservation
         return $object instanceof Reservation
             ? $object->getTitle()
             : 'Reservation'; // shown in the breadcrumb on the create view
-    }    
+    }
+
+    public function getCodeReservation(): ?string
+    {
+        return $this->CodeReservation;
+    }
+
+    public function setCodeReservation(string $CodeReservation): self
+    {
+        $this->CodeReservation = $CodeReservation;
+
+        return $this;
+    }
+
+  
 }

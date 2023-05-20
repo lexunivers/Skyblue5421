@@ -32,6 +32,7 @@ class VolType extends AbstractType
         ->add('typevol', null, array('placeholder' => 'Choisissez !'))
         ->add('instructeur', null, array('placeholder' => 'Si Vol Ecole'))
         ->add('naturevol', null, array('placeholder' => 'Pour les Stats !'))
+        ->add('codereservation')//, null, array('placeholder' => 'N° de Réservation !'))        
         ->add('lieuDepart', null, array('placeholder' => 'Décollage de'))
         ->add('heureDepart')																
         ->add('lieuArrivee', null, array('placeholder' => 'Atterissage à'))

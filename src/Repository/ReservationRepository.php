@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Reservation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use DoctrineExtensions\Query\Mysql;
 
 /**
  * @extends ServiceEntityRepository<Reservation>
@@ -38,6 +39,43 @@ class ReservationRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    //SELECT SUBSTRING(created_at, 1, 10) as Debut, SUBSTRING(last_login, 1, 10) as login, Lastname FROM `user`ORDER BY RAND() LIMIT 1; 
+    /*
+    * code de réservation
+    */
+   // public function codeReservation()
+   // {
+     //   return $this->createQueryBuilder('u')        
+       // ->select('SUBSTRING(u.start, 1, 10) as Debut, SUBSTRING(u.end, 1, 10) as fin, u.reservataire as Nom')
+       // ->addSelect('RAND() as HIDDEN rand')
+       // ->orderBy('rand LIMIT 1')
+       // ->getQuery()
+       // ->getMaxResults(3)
+    //;
+
+    //}
+
+    public function codeReservation()
+    {
+      //  $entityManager = $this->getEntityManager();
+      //  $query = $entityManager->createQuery(
+      //      "SELECT q  FROM App\Entity\Reservation q order by  RAND()")
+      //      ->setMaxResults(3)
+      //  ;
+        
+
+
+        return $this->createQueryBuilder('r')
+        ->select("SUBSTRING(r.start, 1, 10) as jour, count(r) as nombre  ORDER BY RAND()")
+        
+        ->setMaxResults(3)
+        ->getQuery()
+        ->getResult()
+        ;
+    }    
+
+
 
     /*
     * returns number of "reservation" per day

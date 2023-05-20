@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
 use App\Entity\Statistiques;
+use App\Entity\User;
 use App\Entity\OperationComptable;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -34,14 +35,18 @@ class StatistiquesController extends CRUDController
         $cptesDebiteurs = $em->getRepository('App\Entity\OperationComptable')->findByCptesDebiteurs();
         $totalRecettes = $em->getRepository('App\Entity\OperationComptable')->findBySommeTotaleRecette();
         $totalCredits = $em->getRepository('App\Entity\OperationComptable')->findBySommeTotaleCredit();
+       // $users = $em->getRepository('App\Entity\User)')->findAll();
+        //var_dump($users);
+        //exit;
 
-        var_dump($totalCredits);
-        var_dump($totalRecettes);
+       // var_dump($totalCredits);
+        //var_dump($totalRecettes);
        // exit;
 
         $UserNom = [];
         $UserColor = [];
-        $UserCount = [];	      
+        $UserCount = [];
+        $UserDate = [];	      
 
         $cptesDebiteursCount = [];
         $totalRecettesCount = [];
@@ -74,17 +79,20 @@ class StatistiquesController extends CRUDController
         // A - On va chercher tous les Users
         //$em = $this->getDoctrine()->getManager();
             $Users = $em->getRepository('App\Entity\User')->findAll();
- 
+
         // A - 1 On "démonte" les données pour les séparer tel qu'attendu par ChartJS		
  	
             
             foreach($Users as $User){
                 $UserNom[] = $User->getFirstname();
+            //    $UserDate[] = $User->getLastname()->getCreatedAt();
             // $categColor[] = $User->getColor();
             // $UserCount[] = count(is_countable($User)?$UserNom:[]);
                 $UserCount[] = count(array($User));
             }
-
+            //SELECT SUBSTRING(last_login, 1, 10) as derniere_connection, SUBSTRING(created_at, 1, 10) as inscription FROM `user` WHERE username = "marius"; 
+            var_dump($UserDate);
+//exit;
         // B - On va chercher le nombre de reservation par Jour
 			$reservations = $em->getRepository('App\Entity\Reservation')->countByDate();
 
