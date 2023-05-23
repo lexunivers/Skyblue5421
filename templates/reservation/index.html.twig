@@ -247,14 +247,15 @@
 					
 		{% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
 			<h6>Adhérent Connecté: {{ app.user }}</h6> 
-		{#<div class="col-lg-3 text-center">#}
-			<a class="btn btn-info text-center" href="{{ path('reservation_ajout') }}">Réservation Formulaire classique</a>
-		{#</div>#}
-			<a button class="btn btn-outline-primary" role="button" href="{{ path('app_logout') }}">Déconnexion</a>
 		{% endif %}
-				
+			<a class="btn btn-info text-center" href="{{ path('reservation_ajout') }}">Réservation Formulaire classique</a>
+<hr>
+			<a class="btn btn-info text-center" href="{{ path('reserver_liste') }}">Liste de toutes Mes Réservations</a>		
+
+
+			<a button class="btn btn-outline-primary" role="button" href="{{ path('app_logout') }}">Déconnexion</a>				
 		</div>
-		</br>
+
     	
 	<div class="col-lg-11 text-center"> 
         <!-- Button trigger modal -->

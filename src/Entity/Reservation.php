@@ -103,14 +103,10 @@ class Reservation
     }    
 
     /**
-     * @ORM\Column(type="string", length=5)
+     * @ORM\Column(name="CodeReservation", type="string", length=5)
      */
     private $CodeReservation;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Vol::class, mappedBy="codereservation")
-     */
-    private $vols;
 
     public function __construct()
     {

@@ -261,9 +261,9 @@ class Vol
     private $dateOper;
 
     /**
-     * @ORM\Column(name="codereservation",type="string", length=7)
+     * @ORM\Column(name="CodeReservation",type="string", length=7)
      */
-    private $codereservation;
+    private $CodeReservation;
 
 
 
@@ -498,14 +498,14 @@ class Vol
         return $this->validation;
     }
 
-    public function getCodereservation(): ?string
+    public function getCodeReservation(): ?string
     {
-        return $this->codereservation;
+        return $this->CodeReservation;
     }
 
-    public function setCodereservation(string $codereservation): self
+    public function setCodeReservation(string $CodeReservation): self
     {
-        $this->codereservation = $codereservation;
+        $this->CodeReservation = $CodeReservation;
 
         return $this;
     }

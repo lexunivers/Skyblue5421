@@ -119,6 +119,7 @@ class ReservationController extends AbstractController
             // On instancie une nouvelle reservation
             $reservation = new Reservation();
 
+            //$user = $auteur;
             $title = $request->get('user');
             $start = $request->get('start');
             $end = $request->get('end');
@@ -153,7 +154,6 @@ class ReservationController extends AbstractController
 
                 $appareil = $em->getRepository('App\Entity\Resources')->myfindAvion($resourceId);           
                 
-
                 foreach ($appareil as $value) {
 					$value;
 				};
@@ -191,8 +191,7 @@ class ReservationController extends AbstractController
 			}
                 // - 4 - on attribue code Reservation
                 $CodeReservation = rand(0,10000);
-                //echo"code".$CodeReservation;
-                //exit;
+
 
 			$form = $this->createForm(ReservationEditType::class, $reservation);
 			$form->handleRequest($request);
@@ -201,6 +200,7 @@ class ReservationController extends AbstractController
             $reservation->setEnd(new \DateTime($end) );
             $reservation->setResourceId($resourceId);
             $reservation->setReservataire($auteur );
+            //$reservation->setInstructeur($request->get('instructeur'));
             $reservation->setCodeReservation($CodeReservation);
 
             $entityManager = $this->getDoctrine()->getManager();
@@ -322,7 +322,8 @@ class ReservationController extends AbstractController
 
         // On instancie une nouvelle reservation
         $reservation = new Reservation();
-                        // - 4 - on attribue code Reservation
+        
+        // - 4 - on attribue code Reservation
         $CodeReservation = rand(0,10000);
         //echo"code".$CodeReservation;
         //exit;
@@ -346,8 +347,8 @@ class ReservationController extends AbstractController
 				$reservation->setTitle($title);
                 $reservation->setFormateur($reservation->getInstructeur() );
 			}else{			
-			$reservation->setTitle($user);
-            $reservation->setFormateur("Néant");
+			    $reservation->setTitle($user);
+                $reservation->setFormateur("Néant");
 			}
 
         $reservation->setCodeReservation($CodeReservation);			
@@ -358,6 +359,7 @@ class ReservationController extends AbstractController
             $immat = $reservation->getAvion()->getAvion()->getType();
             $identif = $immat."-".$title;        
         $reservation->SetAppareil($identif);
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($reservation);
         $entityManager->flush();
@@ -371,6 +373,23 @@ class ReservationController extends AbstractController
         ]);
 
     }
+
+    /**
+    * @Route("/liste", name="reserver_liste", methods={"GET","POST"})
+    */
+    public function listeMesReservations( Request $request)
+        {
+
+                $reservataire = $this->getUser('session')->getId();
+                       
+                $user = $this->getUser('session')->getUsername();
+                $em = $this->getDoctrine()->getManager();
+                $reservation = $em->getRepository('App\Entity\Reservation')->findBy(array('reservataire' => $reservataire)) ; //(array('title' => $title),
+
+                return $this->render('/Reserver/show.html.twig', array(
+                  'reservation' => $reservation,
+              ));
+        }    
 
 }
 

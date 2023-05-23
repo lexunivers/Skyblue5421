@@ -40,6 +40,27 @@ class ReservationRepository extends ServiceEntityRepository
         }
     }
 
+    //SELECT formateur as formateur, title as title FROM `reservation` WHERE `reservataire` = `reservataire`; 
+	public function myfindFormateur()
+	{
+		return $this->createQueryBuilder('r')
+		->select('r.formateur, r.title, r.reservataire')
+		->where('r.reservataire = r.title')
+		//->setParameter('instructeur',$formateur)
+		->getQuery()
+		->getResult()
+		;
+	}    
+
+    public function formateur (){
+        return $this->createQueryBuilder('r')
+        ->select('r.formateur')
+        ->where('r.reservataire = r.title ' )
+        ->getQuery()
+        ->getResult()
+        ;
+    }          
+    
     //SELECT SUBSTRING(created_at, 1, 10) as Debut, SUBSTRING(last_login, 1, 10) as login, Lastname FROM `user`ORDER BY RAND() LIMIT 1; 
     /*
     * code de réservation
