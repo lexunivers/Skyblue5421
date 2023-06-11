@@ -66,13 +66,6 @@ class ReservationAdminController extends Controller
        
 		$form->handleRequest($request);
 		
-			if ($request->isMethod('GET')) {		
-				
-				$user = 1; 
-				$prenom = $this->getUser('1')->getFirstname();
-				$nom = $this->getUser('1')->getlastname();  
-            }
-
 		$form->getData();
 
 			if ($request->isMethod('POST') && $form->isSubmitted() && $form->isValid()){
@@ -80,22 +73,22 @@ class ReservationAdminController extends Controller
 				$user  = $form->getData()->getUser()->getId();
 				$prenom = $form->getData()->getUser()->getFirstname();
 				$nom = $form->getData()->getUser()->getLastname();
-				
+				$auteur  = $form->getData()->getUser()->getId();
+
                 if ($instructeur = $form->getData()->getInstructeur() == "" ){ 
                     $instructeur = "";
                 }else{                 
                 $instructeur = $form->getData()->getInstructeur()->getNom();
                 $instructeur = $form->getData()->getInstructeur()->getId();
-                }
-
+                $reservataire = $form->getData()->getUser()->getId();
+                }               
                 $_SESSION['user'] = $user;
                 $_SESSION['nom'] = $nom;
                 $_SESSION['prenom'] = $prenom;             
-               // $_SESSION['editMode'] = $editMode;
-                $_SESSION['instructeur'] = $instructeur;            
+                $_SESSION['instructeur'] = $instructeur;
+                $_SESSION['auteur'] = $auteur;                
+        
 			}
-
-           // return $this->redirectToRoute('reservation_index')//; // cast $entity to string
         
             return $this->render('reservation_admin/index.html.twig', [
             'form' => $form->createView(),             

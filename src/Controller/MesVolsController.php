@@ -20,6 +20,8 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use App\Entity\Reservation;
+use Symfony\Component\Form\Extension\Core\Type\EntityType;
 
 class MesVolsController extends AbstractController
 {
@@ -32,16 +34,24 @@ class MesVolsController extends AbstractController
     /**
      * @Route("/vol", name="app_MesVols")
      */	  
-    public function SaisirUnVolAction(Vol $vol = null, Request $request, ObjectManager $manager = null, OperationComptable $operation = null, Avions $avion = null)
+    public function SaisirUnVolAction(Vol $vol = null, Request $request, ObjectManager $manager = null, OperationComptable $operation = null, Avions $avion = null, reservation $reservataire = null)
     {
         $vol = new Vol();    
-        $vol->setUser($this->container->get('security.token_storage')->getToken()->getUser());    
-        $form = $this->createForm(VolType::class, $vol);
+        $user = $vol->setUser($this->container->get('security.token_storage')->getToken()->getUser());
+
+        $reservataire = $this->getUser('session')->getId();
+        $em = $this->getDoctrine()->getManager();
+       
+        $reservation = $em->getRepository('App\Entity\Reservation')->findBy(array('reservataire' => $reservataire)) ;
+        $CodeReservation = $em->getRepository('App\Entity\Reservation')->myfindCodeR($reservataire);
+
+        $form = $this->createForm(VolType::class, $vol, array('reservataire' => $this->getUser()->getId() ) );
+     
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $vol->setFacture($vol->getMontantFacture());
-        
+
             $em = $this->getDoctrine()->getManager();
             $em->persist($vol);
             $em->flush();
@@ -51,6 +61,9 @@ class MesVolsController extends AbstractController
         return $this->render('/MesVols/saisir_Un_Vol.html.twig', [
             'formVol'    => $form->createView(),
             'editMode' => $vol->getId() !== null,
+            'reservataire' => $reservataire,
+            'CodeReservation' => $CodeReservation,
+            'reservation' => $reservation,
             ]);
     }
 

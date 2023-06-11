@@ -19,6 +19,8 @@ use App\Entity\Resources;
 use App\Entity\Instructeur;
 use App\Form\InstructeurType;
 use App\Form\ReservationEditType;
+use Knp\Bundle\PaginatorBundle\KnpPaginatorBundle;
+use Knp\Component\Pager\PaginatorInterface;
 Use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -119,7 +121,6 @@ class ReservationController extends AbstractController
             // On instancie une nouvelle reservation
             $reservation = new Reservation();
 
-            //$user = $auteur;
             $title = $request->get('user');
             $start = $request->get('start');
             $end = $request->get('end');
@@ -128,7 +129,7 @@ class ReservationController extends AbstractController
             $instructeur = $request->get('instructeur');
             $avion = $request->get('avion');
             $appareil = $request->get('appareil');
-            //$user = $request->get('title'); 
+
             $em = $this->getDoctrine()->getManager();
             
             // Une réservation est faite:
@@ -141,11 +142,13 @@ class ReservationController extends AbstractController
               $user = $_SESSION['user'];
               $nom = $_SESSION['nom'];
               $prenom = $_SESSION['prenom'];
-             // $editMode = $_SESSION['editMode'];
-              $instructeur = $_SESSION['instructeur'];    
-              $user = $prenom;              
+              $instructeur = $_SESSION['instructeur'];
+              $auteur = $_SESSION['auteur'];
+              $reservation->setReservataire($auteur);
+              $user = $nom;
+             
             }
-			
+
             // on vérifie s'il y a un instructeur
             if ($instructeur == false ){               
 			    $reservation->setTitle($user);
@@ -162,7 +165,6 @@ class ReservationController extends AbstractController
              
             }else{
 
-               // $em = $this->getDoctrine()->getManager();
                 $formateur = $em->getRepository('App\Entity\Instructeur')->myfindNom($instructeur);              		
 				$initiale = $em->getRepository('App\Entity\Instructeur')->myfindInitiales($instructeur);				
                 $appareil = $em->getRepository('App\Entity\Resources')->myfindAvion($resourceId);
@@ -186,12 +188,13 @@ class ReservationController extends AbstractController
 					$value3;
 				};
 
-				$title	= $user." / ".$value3;              
+                // la mention 'Club' signifie que la réservation a été faite par la secrétaire du club
+				$title	= $user." / ".$value3."/ Club";              
 				$reservation->setTitle($title);
+
 			}
                 // - 4 - on attribue code Reservation
                 $CodeReservation = rand(0,10000);
-
 
 			$form = $this->createForm(ReservationEditType::class, $reservation);
 			$form->handleRequest($request);
@@ -199,15 +202,15 @@ class ReservationController extends AbstractController
             $reservation->setStart(new \DateTime($start) );
             $reservation->setEnd(new \DateTime($end) );
             $reservation->setResourceId($resourceId);
-            $reservation->setReservataire($auteur );
-            //$reservation->setInstructeur($request->get('instructeur'));
             $reservation->setCodeReservation($CodeReservation);
-
+            $reservation->setReservataire($auteur);
+            
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($reservation);
             $entityManager->flush();
         }
 
+        
         //$response = new Response(json_encode($stop));
         //$response->headers->set('Content-Type', 'application/json');
         //return $response;
@@ -323,7 +326,7 @@ class ReservationController extends AbstractController
         // On instancie une nouvelle reservation
         $reservation = new Reservation();
         
-        // - 4 - on attribue code Reservation
+        // - on attribue code Reservation
         $CodeReservation = rand(0,10000);
         //echo"code".$CodeReservation;
         //exit;
@@ -377,14 +380,43 @@ class ReservationController extends AbstractController
     /**
     * @Route("/liste", name="reserver_liste", methods={"GET","POST"})
     */
-    public function listeMesReservations( Request $request)
+    public function listeMesReservations( Request $request, PaginatorInterface $paginator)
         {
 
                 $reservataire = $this->getUser('session')->getId();
-                       
+                $auteur = $this->getUser('session')->getId();
+                $user = $this->getUser('session')->getUsername();
+                //var_dump($reservataire);               
+                if($user == "admin"){
+
+                    $user = $_SESSION['user'];
+                    $nom = $_SESSION['nom'];
+                    $prenom = $_SESSION['prenom'];
+                   // $editMode = $_SESSION['editMode'];
+                    $instructeur = $_SESSION['instructeur'];
+                    $reservation->setReservataire($user = $_SESSION['user']);  
+                    $user = $prenom; 
+                }
                 $user = $this->getUser('session')->getUsername();
                 $em = $this->getDoctrine()->getManager();
-                $reservation = $em->getRepository('App\Entity\Reservation')->findBy(array('reservataire' => $reservataire)) ; //(array('title' => $title),
+                //$reservataire = $em->getRepository('App\Entity\Reservation')->myReservataire();
+                //var_dump($reservataire);
+              
+                //$reservation = $em->getRepository('App\Entity\Reservation')->findBy(
+                //                                                                    array('reservataire' => $reservataire),                                                                                    
+                //                                                                    array('start' => 'ASC' ),
+                //                                                                    ) ; //(array('title' => $title),
+
+
+
+                   $reservation = $em->getRepository('App\Entity\Reservation')->findBy(array('reservataire' => $reservataire)) ;
+                   $reservation  = $paginator->paginate(
+                   $reservation, 
+                   $request->query->getInt('page', 1),
+                    5 /* límite por página */
+                );
+              
+        
 
                 return $this->render('/Reserver/show.html.twig', array(
                   'reservation' => $reservation,

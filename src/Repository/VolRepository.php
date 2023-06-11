@@ -21,6 +21,18 @@ class VolRepository extends ServiceEntityRepository
     }
 
 
+public function findByUser($user)
+{
+    return $this->createQueryBuilder('c')
+    ->select('c.CodeReservation','c.user')
+    ->innerJoin('App\Entity\Reservation','r')
+    ->where('r.user =:user')
+    ->setParameter('user',$user)        
+    ->getQuery()
+    ->getResult()
+    ;
+}
+
     /**
      * @return Avion[] Returns an array of Avion objects
     */

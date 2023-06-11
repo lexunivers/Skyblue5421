@@ -265,6 +265,17 @@ class Vol
      */
     private $CodeReservation;
 
+    public function getCodeReservation(): ?string
+    {
+        return $this->CodeReservation;
+    }
+
+    public function setCodeReservation(string $CodeReservation): self
+    {
+        $this->CodeReservation = $CodeReservation;
+
+        return $this;
+    }    
 
 
 
@@ -286,6 +297,13 @@ class Vol
         return $this;
     }
     
+    //Récuperation de $reservataire pour la requête dans formBuilder de VolType
+     
+    public function Reservataire(){
+        $reservataire = $this->getUser('session')->getId();
+
+    }
+
 
     // ----- Affichage dans ConfigList selon qu'il s'agit d'un vol Solo, Ecole
 
@@ -315,40 +333,40 @@ class Vol
 	
 	public function add_heures($heure1,$heure2){
                                  			
-                                 		$vol = new vol();
-                                 		$secondes1= $vol->heure_to_secondes($heure1);
-                                 		$secondes2= $vol->heure_to_secondes($heure2);
-                                 		$somme=$secondes1+$secondes2;
-                                 		//transfo en h:i:s
-                                 		$s=$somme % 60; //reste de la division en minutes => secondes
-                                 		$m1=($somme-$s) / 60; //minutes totales
-                                 		$m=$m1 % 60;//reste de la division en heures => minutes
-                                 		$h=($m1-$m) / 60; //heures
-                                 		$resultat=$h.":".$m.":".$s;
-                                 		return $resultat;
-                                 	}
+        $vol = new vol();
+        $secondes1= $vol->heure_to_secondes($heure1);
+        $secondes2= $vol->heure_to_secondes($heure2);
+        $somme=$secondes1+$secondes2;
+        //transfo en h:i:s
+        $s=$somme % 60; //reste de la division en minutes => secondes
+        $m1=($somme-$s) / 60; //minutes totales
+        $m=$m1 % 60;//reste de la division en heures => minutes
+        $h=($m1-$m) / 60; //heures
+        $resultat=$h.":".$m.":".$s;
+        return $resultat;
+    }
 
     // ----- function lorsqu'un vol est supprimer on ajuste tmps fonctionnement du moteur
 	public function diff_heures($heure1,$heure2){
                                  			
-                                 		$vol = new vol();
-                                 		$secondes1= $vol->heure_to_secondes($heure1);
-                                 		$secondes2= $vol->heure_to_secondes($heure2);
-                                 		$diff=$secondes1-$secondes2;
-                                 		//transfo en h:i:s
-                                 		$s=$diff % 60; //reste de la division en minutes => secondes
-                                 		$m1=($diff-$s) / 60; //minutes totales
-                                 		$m=$m1 % 60;//reste de la division en heures => minutes
-                                 		$h=($m1-$m) / 60; //heures
-                                 		$resultat=$h.":".$m.":".$s;
-                                 		return $resultat;
-                                 	}
+        $vol = new vol();
+        $secondes1= $vol->heure_to_secondes($heure1);
+        $secondes2= $vol->heure_to_secondes($heure2);
+        $diff=$secondes1-$secondes2;
+        //transfo en h:i:s
+        $s=$diff % 60; //reste de la division en minutes => secondes
+        $m1=($diff-$s) / 60; //minutes totales
+        $m=$m1 % 60;//reste de la division en heures => minutes
+        $h=($m1-$m) / 60; //heures
+        $resultat=$h.":".$m.":".$s;
+        return $resultat;
+    }
 
 	public function heure_to_secondes($heure){
-                                 		$array_heure=explode(":",$heure);
-                                 		$secondes=3600*$array_heure[0]+60*$array_heure[1]+$array_heure[2];
-                                 		return $secondes;
-                                 	}
+        $array_heure=explode(":",$heure);
+        $secondes=3600*$array_heure[0]+60*$array_heure[1]+$array_heure[2];
+        return $secondes;
+    }
 
 
     public function HeuresdeF()
@@ -436,6 +454,7 @@ class Vol
     public function __toString(): string
     {
 		  return $this->facture;
+
 	}
 
     public function getFacture(): ?string
@@ -497,22 +516,4 @@ class Vol
     {
         return $this->validation;
     }
-
-    public function getCodeReservation(): ?string
-    {
-        return $this->CodeReservation;
-    }
-
-    public function setCodeReservation(string $CodeReservation): self
-    {
-        $this->CodeReservation = $CodeReservation;
-
-        return $this;
-    }
-
-
-
-
-    
-
 }

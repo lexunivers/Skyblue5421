@@ -108,6 +108,8 @@ class Reservation
     private $CodeReservation;
 
 
+
+
     public function __construct()
     {
         $this->vols = new ArrayCollection();
@@ -246,6 +248,8 @@ class Reservation
 
         return $this;
     }
+
+
 
   
 }

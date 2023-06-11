@@ -40,12 +40,35 @@ class ReservationRepository extends ServiceEntityRepository
         }
     }
 
-    //SELECT formateur as formateur, title as title FROM `reservation` WHERE `reservataire` = `reservataire`; 
-	public function myfindFormateur()
+    public function myfindCode($CodeReservation)
 	{
 		return $this->createQueryBuilder('r')
-		->select('r.formateur, r.title, r.reservataire')
-		->where('r.reservataire = r.title')
+		->select('r.id','r.reservataire', 'r.user')
+		->where('r.id = :CodeReservation')
+		->setParameter('CodeReservation',$CodeReservation)
+		->getQuery()
+        ->getResult()
+		;
+	}
+
+    public function myfindCodeR($reservataire)
+	{
+		return $this->createQueryBuilder('r')
+        ->select('r.CodeReservation')
+        ->where('r.reservataire =:reservataire')
+		->setParameter('reservataire',$reservataire)        
+		->getQuery()
+        ->getResult()
+		;
+	}        
+
+    //SELECT formateur as formateur, title as title FROM `reservation` WHERE `reservataire` = `reservataire`; 
+	public function myReservataire()
+	{
+		return $this->createQueryBuilder('r')
+		->select('r.reservataire')
+		->where('r.reservataire = 1 OR r.reservataire = 8 ')
+        //->andwhere('r.reservataire = 1')
 		//->setParameter('instructeur',$formateur)
 		->getQuery()
 		->getResult()

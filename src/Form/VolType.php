@@ -8,6 +8,15 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+//use Symfony\Component\Form\Extension\Core\Type\EntityType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+//use Symfony\Component\Form\Extension\Core\Type\EntityType;
+use App\Form\ReservationType;
+use App\Entity\Reservation;
+use App\Entity\User;
+use App\Entity\Vol;
+use Doctrine\ORM\EntityRepository;
 
 class VolType extends AbstractType
 {
@@ -16,6 +25,8 @@ class VolType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $reservataire = $options['reservataire'];
+
         $builder
         ->add('datevol', DateType::class, [
             'attr' => array(
@@ -32,7 +43,24 @@ class VolType extends AbstractType
         ->add('typevol', null, array('placeholder' => 'Choisissez !'))
         ->add('instructeur', null, array('placeholder' => 'Si Vol Ecole'))
         ->add('naturevol', null, array('placeholder' => 'Pour les Stats !'))
-        ->add('codereservation')//, null, array('placeholder' => 'N° de Réservation !'))        
+        ->remove('reservataire', EntityType::Class, ['class' => Reservation::class,'choice_label' => 'reservataire'])//, null, array('attr'=> array('placeholder' => 'Réservataire !') ))
+
+        ->add('CodeReservation', EntityType::class, [
+                'class' => Reservation::class,
+                'query_builder' => function (EntityRepository $er) use ($reservataire){
+                    return $er->createQueryBuilder('r')
+                    ->where('r.reservataire =:reservataire')
+                    ->setParameter('reservataire',$reservataire)
+                    ;
+                },
+            'choice_label' => 'CodeReservation',
+        ])        
+
+       // ->add('CodeReservation', null,  array('attr'=> array('placeholder' => 'N° de Réservation !') ))
+        //->add('CodeReservation',EntityType::class,['class' => Reservation::class,'choice_label' => 'CodeReservation'])        
+
+                    
+
         ->add('lieuDepart', null, array('placeholder' => 'Décollage de'))
         ->add('heureDepart')																
         ->add('lieuArrivee', null, array('placeholder' => 'Atterissage à'))
@@ -47,7 +75,9 @@ class VolType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'App\Entity\Vol'
+            'data_class' => 'App\Entity\Vol',
+            //'user' => null,
+            'reservataire' => null,
         ));
     }
 
