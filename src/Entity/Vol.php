@@ -451,11 +451,12 @@ class Vol
         return 	'Date : '.$this->datevol->format('d-m-Y ').' - '.'Vol de : '.$this->DureeDuVol('%h:%I').' h/min -'.$this->avion.' - '.'Instructeur : '.$this->instructeur;
     }
 
-    public function __toString(): string
-    {
-		  return $this->facture;
+    //public function __toString(): string
+    //{
+		//  return $this->facture;
+//          return $this->CodeReservation ;
 
-	}
+	//}
 
     public function getFacture(): ?string
     {

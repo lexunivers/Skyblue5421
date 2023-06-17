@@ -43,6 +43,7 @@
 						<th>Tarif Ecole</th>                                                                                                                                                                                                            
 						<th>Tarif Retenu</th>                                                                                                                                                                                                            
 						<th>Débit €uros</th>
+						<th>Code R</th>
 						<th>Action</th>												
 					</tr>										
 				</thead>					  
@@ -63,6 +64,7 @@
 							<td><detail>{{ vol.affichageEcole | number_format(2, '.', ',') }}</detail></td>								   
 							<td><detail>{{ vol.tarifapplicable | number_format(2, '.', ',') }}</detail></td> 	    
 							<td><detail>{{ vol.montantfacture | number_format(2, '.', ',') }}</detail></td>
+							<td><detail>{{ vol.CodeReservation }}</detail></td>
 							<td>
 								<div class="btn-group">
 									<a href="{{ path('sky_gestion_vol_modifier', {'id': vol.id}) }}" class="btn btn-sm btn-default edit_link" title="Modifier">

@@ -29,7 +29,7 @@ class MonCompteController extends AbstractController
                 
         $listEcritures = $em->getRepository('App\Entity\OperationComptable')->findBy(
                                             array('CompteId' => $user),
-                                            array('OperDate' => 'ASC')
+                                            array('OperDate' => 'DESC')
                                              );
         $sommeTotale =$em->getRepository('App\Entity\OperationComptable')->myfindSommeTotale($user);
         $montantdebit = $em->getRepository('App\Entity\OperationComptable')->myFindDebit($user);

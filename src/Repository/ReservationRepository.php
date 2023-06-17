@@ -53,12 +53,20 @@ class ReservationRepository extends ServiceEntityRepository
 
     public function myfindCodeR($reservataire)
 	{
-		return $this->createQueryBuilder('r')
-        ->select('r.CodeReservation')
-        ->where('r.reservataire =:reservataire')
-		->setParameter('reservataire',$reservataire)        
-		->getQuery()
-        ->getResult()
+
+        $qb = $this->createQueryBuilder('r');
+         
+        $qb->where('r.reservataire = :reservataire')
+           ->setParameter('reservataire', $reservataire);
+                 
+        return $qb;
+
+		//return $this->createQueryBuilder('r')
+        //->select('r.CodeReservation')
+        //->where('r.reservataire =:reservataire')
+		//->setParameter('reservataire',$reservataire)        
+		//->getQuery()
+        //->getResult()
 		;
 	}        
 

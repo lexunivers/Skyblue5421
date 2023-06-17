@@ -221,10 +221,5 @@ class UserAdmin extends AbstractAdmin
         );
     }
 	
-    public function toString(object $object): string
-    {
-        return $object instanceof User
-            ? $object->getTitle()
-            : 'Membre'; // shown in the breadcrumb on the create view
-    }	
+
 }

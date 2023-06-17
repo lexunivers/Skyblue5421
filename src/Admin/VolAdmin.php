@@ -62,9 +62,11 @@ final class VolAdmin extends AbstractAdmin
             ->add('tarifapplicable', FieldDescriptionInterface::TYPE_CURRENCY, ['label' => 'Tarif Appliqué', 'currency' => 'EUR'])
             ->add('montantfacture', FieldDescriptionInterface::TYPE_CURRENCY, ['label' => 'Facture','currency' => 'EUR',
                                                                                 'label_icon' => 'fa fa-credit-card',
-                                                                                'header_class' =>'color:red;font:bold',])                                        
+                                                                                'header_class' =>'color:red;font:bold',])
+
             ->add('validation', FieldDescriptionInterface::TYPE_BOOLEAN, ['label' =>'Validé ? ','editable' => true])
             ->add('user.comptepilote.id', null, array('label'=>'N° cptable'))
+            ->add('CodeReservation',null, ['label'=>'Code'])
 			->add(ListMapper::NAME_ACTIONS, null, [
 				'actions' => [
 					'show' => [],
@@ -89,10 +91,15 @@ final class VolAdmin extends AbstractAdmin
 								  ], 
 								  ['placeholder' => 'Pas de Pilote selectionné',])
                
-            ->end()		
+                ->end()		
 
             ->with('Données du Vol', ['class' => 'col-md-4','box_class'=> 'box box-solid box-success'])
 				->add('datevol', null, ['label'=>'Date du Vol' ])
+                ->add('CodeReservation',null, ['label'=>'CodeReservation',
+                                     //'class' => 'App\Entity\Vol',
+                                     //'required' => true 
+                                     ])
+
                 ->add('avion',null, ['label'=>'Avion',
                                      'class' => 'App\Entity\Avions',
                                      'required' => true ])												 
@@ -147,6 +154,7 @@ final class VolAdmin extends AbstractAdmin
 			->end()	
 							
 			->with('Tarification/Facturation',['class' => 'col-md-4', 'box_class'   => 'box box-solid box-danger'])	
+                ->add('CodeReservation',null, ['label'=>'Code R'])
                 ->add('avion.TarifHoraire', FieldDescriptionInterface::TYPE_CURRENCY,['label'=>'Tarif Solo','currency' => 'EUR'])
                 ->add('affichageEcole',FieldDescriptionInterface::TYPE_CURRENCY,['label'=>'Tarif Instruction','currency' => 'EUR'])
                 ->add('tarifapplicable',FieldDescriptionInterface::TYPE_CURRENCY,['label' => 'Tarif Retenu','currency' => 'EUR'])

@@ -232,6 +232,8 @@ class Reservation
 
     public function toString($object): string
     {
+
+        return $this->CodeReservation ;        
         return $object instanceof Reservation
             ? $object->getTitle()
             : 'Reservation'; // shown in the breadcrumb on the create view
@@ -249,7 +251,12 @@ class Reservation
         return $this;
     }
 
+    public function __toString(): string
+    {
+		  //return $this->facture;
+          return $this->CodeReservation ;
 
+	}
 
   
 }

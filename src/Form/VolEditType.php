@@ -15,7 +15,7 @@ class VolEditType extends AbstractType
                   'disabled'=> true,
                   'label' 	=> 'Date de Saisie',
             ))
-            ->remove('codereservation')
+            ->add('CodeReservation')
             ->add('facture')
             ->add('valider', SubmitType::class, array('label' => 'Confirmer'))
             ;

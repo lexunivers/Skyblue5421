@@ -41,9 +41,8 @@ class MesVolsController extends AbstractController
 
         $reservataire = $this->getUser('session')->getId();
         $em = $this->getDoctrine()->getManager();
-       
-        $reservation = $em->getRepository('App\Entity\Reservation')->findBy(array('reservataire' => $reservataire)) ;
-        $CodeReservation = $em->getRepository('App\Entity\Reservation')->myfindCodeR($reservataire);
+        //$reservation = $em->getRepository('App\Entity\Reservation')->findBy(array('reservataire' => $reservataire)) ;
+        //$CodeReservation = $em->getRepository('App\Entity\Reservation')->myfindCodeR($reservataire);
 
         $form = $this->createForm(VolType::class, $vol, array('reservataire' => $this->getUser()->getId() ) );
      
@@ -56,14 +55,19 @@ class MesVolsController extends AbstractController
             $em->persist($vol);
             $em->flush();
            // $request->getSession()->getFlashBag()->add('success', 'Le Vol a bien été enregistré.');
-            return $this->redirect($this->generateUrl('app_MesVols_confirmer', ['id' => $vol->getId(), 'avion' => $vol->getAvion('id'), 'Heuresdevol' => $vol->DureeDuVol() ]));
+            return $this->redirect($this->generateUrl('app_MesVols_confirmer', ['id' => $vol->getId(),
+                                                                                'avion' => $vol->getAvion('id'),
+                                                                                'Heuresdevol' => $vol->DureeDuVol(), 
+                                                                                //'CodeReservation' => $vol->getCodeReservation() 
+                                                                                ]
+                                                                            ));
         }        
         return $this->render('/MesVols/saisir_Un_Vol.html.twig', [
             'formVol'    => $form->createView(),
             'editMode' => $vol->getId() !== null,
             'reservataire' => $reservataire,
-            'CodeReservation' => $CodeReservation,
-            'reservation' => $reservation,
+            //'CodeReservation' => $CodeReservation,
+
             ]);
     }
 
@@ -80,6 +84,7 @@ class MesVolsController extends AbstractController
         $operation ->setOperSensMt(0);
         $operation->setLibelle($vol->getLibelle());
 		$avion = $vol->getAvion('id');
+        $CodeReservation = $vol->setCodeReservation($vol->getCodeReservation() ) ;
 
         $em = $this->getDoctrine()->getManager();
 				
