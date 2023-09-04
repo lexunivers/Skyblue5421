@@ -109,7 +109,7 @@ class ParametresController extends CRUDController
 
 
     public function formValidate($data, ExecutionContextInterface $context) {
-        //$request->getSession();     
+        $request->getSession();     
         //$data = $this->getRequest()->request->get('form');
         $data = $request->getSession()->get('form');
         //$locale = $this->getRequest()->getLocale();

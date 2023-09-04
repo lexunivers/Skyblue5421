@@ -18,6 +18,7 @@ use App\Repository\AvionsRepository;
 use App\Entity\Resources;
 use App\Entity\Instructeur;
 use App\Form\InstructeurType;
+use App\Entity\CodeAttribue;
 use App\Form\ReservationEditType;
 use Knp\Bundle\PaginatorBundle\KnpPaginatorBundle;
 use Knp\Component\Pager\PaginatorInterface;
@@ -113,7 +114,13 @@ class ReservationController extends AbstractController
         $session = $this->get("session");
         $auteur = $this->getUser('session')->getId();
         $user = $this->getUser('session')->getUsername();
-				
+
+        if ($user == "admin"){
+            $staff = 1;
+        }else{
+            $staff = 0;
+        }        
+
         if($request->isXmlHttpRequest()) {
             
             $id = $request->get('id');            
@@ -138,7 +145,6 @@ class ReservationController extends AbstractController
             // Si la réservation est faite par le Club, il faut changer "admin" par le nom du pilote
             
             if($user == "admin"){
-
               $user = $_SESSION['user'];
               $nom = $_SESSION['nom'];
               $prenom = $_SESSION['prenom'];
@@ -146,12 +152,18 @@ class ReservationController extends AbstractController
               $auteur = $_SESSION['auteur'];
               $reservation->setReservataire($auteur);
               $user = $nom;
-             
             }
 
             // on vérifie s'il y a un instructeur
             if ($instructeur == false ){               
-			    $reservation->setTitle($user);
+			    
+                // - Si Réservation par la secrétaire club. Vol Solo
+                if($staff == 1){
+                    $reservation->setTitle($user."/Club");
+                }else{
+                    $reservation->setTitle($user);
+                }
+                
                 $reservation->setFormateur("Néant");
                 $reservation->setUser($title);          
 
@@ -188,13 +200,27 @@ class ReservationController extends AbstractController
 					$value3;
 				};
 
-                // la mention 'Club' signifie que la réservation a été faite par la secrétaire du club
-				$title	= $user." / ".$value3."/ Club";              
-				$reservation->setTitle($title);
+                // la mention 'Club': Réservation faite par secrétaire du club.Vol avec Instructeur
+                if ($staff == 1){
+                    $title = $user." / ".$value3."/Club";    
+                }else{
+                    $title = $user." / ".$value3;
+                }
+                $reservation->setTitle($title);
 
 			}
-                // - 4 - on attribue code Reservation
-                $CodeReservation = rand(0,10000);
+                // - 4 - on attribue un code de Reservation
+                $NumeroOrdre = rand(0,10000);
+
+                // on enregistre le code obtenu dans CodeAttribué          
+                $CodeAttribue = new CodeAttribue();
+                $CodeAttribue->setNombre($NumeroOrdre); 
+         
+                // on renseigne attribut Realisée dans entity Reservation
+                // Permet de contrôler les Réservations d'un Pilote et les vols
+                // qu'il a réellement réalisés. Permet de limiter les abus de réservation.
+                $realisation = "0";
+
 
 			$form = $this->createForm(ReservationEditType::class, $reservation);
 			$form->handleRequest($request);
@@ -202,11 +228,14 @@ class ReservationController extends AbstractController
             $reservation->setStart(new \DateTime($start) );
             $reservation->setEnd(new \DateTime($end) );
             $reservation->setResourceId($resourceId);
-            $reservation->setCodeReservation($CodeReservation);
+            $reservation->setNumeroOrdre($NumeroOrdre);
             $reservation->setReservataire($auteur);
-            
+            $reservation->setRealisation($realisation);
+
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($reservation);
+            $entityManager->persist($CodeAttribue);
             $entityManager->flush();
         }
 
@@ -380,46 +409,55 @@ class ReservationController extends AbstractController
     /**
     * @Route("/liste", name="reserver_liste", methods={"GET","POST"})
     */
-    public function listeMesReservations( Request $request, PaginatorInterface $paginator)
+    public function listeMesReservations(Request $request, PaginatorInterface $paginator)
         {
 
                 $reservataire = $this->getUser('session')->getId();
                 $auteur = $this->getUser('session')->getId();
                 $user = $this->getUser('session')->getUsername();
-                //var_dump($reservataire);               
+              
                 if($user == "admin"){
 
                     $user = $_SESSION['user'];
                     $nom = $_SESSION['nom'];
                     $prenom = $_SESSION['prenom'];
-                   // $editMode = $_SESSION['editMode'];
                     $instructeur = $_SESSION['instructeur'];
-                    $reservation->setReservataire($user = $_SESSION['user']);  
-                    $user = $prenom; 
+                    $reservation->setReservataire($user = $_SESSION['user']); 
+                    $user = $prenom;
+
                 }
                 $user = $this->getUser('session')->getUsername();
                 $em = $this->getDoctrine()->getManager();
-                //$reservataire = $em->getRepository('App\Entity\Reservation')->myReservataire();
-                //var_dump($reservataire);
-              
-                //$reservation = $em->getRepository('App\Entity\Reservation')->findBy(
-                //                                                                    array('reservataire' => $reservataire),                                                                                    
-                //                                                                    array('start' => 'ASC' ),
-                //                                                                    ) ; //(array('title' => $title),
 
+                $reservation = $em->getRepository('App\Entity\Reservation')->findBy(array('reservataire' => $reservataire), 
+                                                                                       array('start' => 'ASC') ) ;
 
+            foreach ($reservation as $id => $valeur16) {
+           //     echo"ID 16 ICI: ".$valeur16->getId().'<br />'."\n";
+            } 
 
-                   $reservation = $em->getRepository('App\Entity\Reservation')->findBy(array('reservataire' => $reservataire)) ;
+            foreach ($reservation as $id => $valeur50) {
+                //echo"ID trouve ICI : ".$valeur50->getId().'<br />'."\n";
+            }            
+            $editMode = 1; 
+           // var_dump($value50);
+           // $value15->getId();
+
+          // for ($value15=0; $value15 ; $value15++) {
+            //    $value;
+           //}; 
+           //var_dump($value);
+           //var_dump($cle->getValeur50()->getId() );
+           // var_dump($reservation);
+          //  exit;               
                    $reservation  = $paginator->paginate(
                    $reservation, 
                    $request->query->getInt('page', 1),
                     5 /* límite por página */
                 );
-              
-        
-
+              //var_dump($value15);
                 return $this->render('/Reserver/show.html.twig', array(
-                  'reservation' => $reservation,
+                  'reservation' => $reservation, 'editMode'=>$editMode,
               ));
         }    
 

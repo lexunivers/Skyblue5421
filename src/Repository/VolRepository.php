@@ -21,6 +21,11 @@ class VolRepository extends ServiceEntityRepository
     }
 
 
+//SELECT (v.CodeReservation) as CodeDsVol, (v.User_id) as Pilote,(r.CodeReservation) as CodeDsReservation FROM `vol`v, reservation r WHERE v.CodeReservation = r.CodeReservation;     
+
+
+
+
 public function findByUser($user)
 {
     return $this->createQueryBuilder('c')

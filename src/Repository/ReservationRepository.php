@@ -40,10 +40,125 @@ class ReservationRepository extends ServiceEntityRepository
         }
     }
 
+// modéle pour éviter chevauchement
+//    SELECT
+//    COUNT(*) AS compteur
+//FROM
+//            reservations
+//WHERE
+//        :dateArrivee BETWEEN date_arrivee AND date_depart
+//    OR  :dateDepart BETWEEN date_arrivee AND date_depart
+//    OR  :dateArrivee < date_arrivee
+//        AND :dateDepart > date_depart
+
+public function myfindNumeroOrdreId($NumeroOrdre){
+    return $this->createQueryBuilder('r')
+    ->select('r.id','r.NumeroOrdre','r.realisation','r.reservataire')
+    //->where('r.NumeroOrdre =:NumeroOrdre')
+    ->where('r.NumeroOrdre = :NumeroOrdre')
+    //->andWhere('realisation = false')
+    ->setParameter( 'NumeroOrdre', $NumeroOrdre)
+    //->setParameter('r.realisation', true)
+    //->andWhere('r.NumeroOrdre =:NumeroOrdre')
+    //->setParameter('r.realisation', true)
+    ->getQuery()
+    ->getResult()
+    ;    
+}
+
+public function myfindOrdreId($NumeroOrdre){
+    return $this->createQueryBuilder('r')
+    ->select('r.id','r.NumeroOrdre','r.realisation')
+    ->where('r.id =:id')
+    //->andWhere('r.realisation =false')
+    //->setParameter('realisation', true)
+    ->setParameter( 'id', $NumeroOrdre)
+    ->getQuery()
+    ->getResult()
+    ;    
+}
+
+public function findByCodeReservation($reservataire)
+{
+    return $this->createQueryBuilder('r')
+    ->select('r.CodeReservation', 'r.title')
+    //->innerJoin('App\Entity\Vol','v')
+    //->where('r.CodeReservation =:CodeReservation')
+    ->setParameter('CodeReservation',$reservataire)        
+    ->getQuery()
+    ->getResult()
+    ;
+}
+//SELECT `NumeroOrdre`as NumeroR, CodeReservation as CodeV, reservataire as User FROM reservation, vol V WHERE CodeReservation = 4682; 
+//SELECT `NumeroOrdre`as NumeroR, CodeReservation as CodeV, reservataire as User FROM reservation, vol V WHERE CodeReservation = 483 AND reservataire = 8; 
+    
+
+    public function myfindReserv($id)
+    {
+    return $this->createQueryBuilder('i')
+        ->select('i.id, i.NumeroOrdre, i.reservataire')
+        //->innerJoin('CodeReservation', 'V')
+        //->addSelect('V CodeReservation')
+        //->andWhere('i.NumeroOrdre = V.CodeReservation')
+        ->andWhere('i.id = :id')
+        ->setParameter('id', $id)
+		->getQuery()
+        ->getResult()
+		;        
+    }
+
+    public function myfindRealisation($CodeReservation)
+    {
+		return $this->createQueryBuilder('r')
+            ->select('r.NumeroOrdre, r.reservataire, r.id, r.title, r.realisation')
+            
+            ->addSelect('Vol','V')
+            ->innerJoin('CodeReservation','V')
+            ->where('r.id = V.CodeReservation')
+           // >setParameter('NumeroOrdre', $CodeReservation)
+            // ->addSelect('user') 
+           // ->andWhere('CodeReservation V = NumeroOrdre')
+           // ->andWhere('r.id =:NumeroOrdre')
+            //->andWhere('r.NumeroOrdre = :NumeroOrdre')
+            //->setParameter('r.id =:?id')
+            //->setParameter('id = $id')
+            //->setParameter('r.realisation', '1-r.realisation' )
+
+            
+
+
+
+        //->from('App\Entity\Reservation', 'V')
+        //->addSelect('V.CodeReservation')
+        //->addSelect('V.reservataire')
+
+
+        //->Where('r.CodeReservation = V.CodeReservation ')
+        //->andWhere('r.reservataire = : V.reservataire')
+        //->andWhere('O.CompteId = :V.id')
+        //->setParameter('V.id', $vol)
+		//->setParameter('r.id',$id)
+		->getQuery()
+        ->getResult()
+		;
+
+    }
+
     public function myfindCode($CodeReservation)
 	{
 		return $this->createQueryBuilder('r')
-		->select('r.id','r.reservataire', 'r.user')
+		->select('r.id','r.reservataire','r.CodeReservation')
+		->where('r.CodeReservation = :CodeReservation ')
+		->setParameter('CodeReservation',$CodeReservation)
+		->getQuery()
+        ->getResult()
+		;
+	}
+
+    public function myfindCodeReservation($CodeReservation)
+	{
+		return $this->createQueryBuilder('r')
+		->select('r.id','r.reservataire','r.CodeReservation')
 		->where('r.id = :CodeReservation')
 		->setParameter('CodeReservation',$CodeReservation)
 		->getQuery()
@@ -51,6 +166,9 @@ class ReservationRepository extends ServiceEntityRepository
 		;
 	}
 
+    //SELECT (v.CodeReservation) as CodeDsVol, (v.User_id) as Pilote,(r.CodeReservation) as CodeDsReservation FROM `vol`v, reservation r WHERE v.CodeReservation = r.CodeReservation;     
+//SELECT (v.id) as RandDsVol, (v.CodeReservation) as CodeDsVol, (v.User_id) as Pilote,(r.NumeroOrdre) as NumeroDsReservation, (r.id) as idDansReservation FROM `vol`v, reservation r WHERE v.CodeReservation = r.NumeroOrdre; 
+  
     public function myfindCodeR($reservataire)
 	{
 
@@ -58,17 +176,23 @@ class ReservationRepository extends ServiceEntityRepository
          
         $qb->where('r.reservataire = :reservataire')
            ->setParameter('reservataire', $reservataire);
-                 
         return $qb;
+		
+	}
+    
 
-		//return $this->createQueryBuilder('r')
-        //->select('r.CodeReservation')
-        //->where('r.reservataire =:reservataire')
-		//->setParameter('reservataire',$reservataire)        
-		//->getQuery()
-        //->getResult()
+    public function myfindPetitCodeR($reservataire)
+	{    
+		return $this->createQueryBuilder('r')
+        ->select('r.NumeroOrdre, r.id , r.reservataire, r.realisation')
+        ->where('r.reservataire =:reservataire')
+       // ->andWhere('r.NumeroOrdre =:CodeReservation')
+		->setParameter('reservataire',$reservataire)        
+		->getQuery()
+        ->getResult()
 		;
-	}        
+	}    
+
 
     //SELECT formateur as formateur, title as title FROM `reservation` WHERE `reservataire` = `reservataire`; 
 	public function myReservataire()

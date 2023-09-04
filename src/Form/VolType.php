@@ -44,12 +44,14 @@ class VolType extends AbstractType
         ->add('typevol', null, array('placeholder' => 'Choisissez !'))
         ->add('instructeur', null, array('placeholder' => 'Si Vol Ecole'))
         ->add('naturevol', null, array('placeholder' => 'Pour les Stats !'))
-        ->remove('reservataire', EntityType::Class, ['class' => Reservation::class,'choice_label' => 'reservataire'])//, null, array('attr'=> array('placeholder' => 'Réservataire !') ))      
-        ->add('CodeReservation', EntityType::class, [                     
-                        'label' => 'CodeReservation',
+        //->remove('reservataire', EntityType::Class, ['class' => Reservation::class,'choice_label' => 'reservataire'])//, null, array('attr'=> array('placeholder' => 'Réservataire !') ))      
+        //->add('CodeReservation', EntityType::class,['class'=>Reservation::class, 'choice_value' => 'NumeroOrdre', ])
+       
+         ->add('CodeReservation', EntityType::class, [                     
+                        'label' => 'NumeroOrdre',
                         'class' => Reservation::class,
-                        'choice_value' => 'CodeReservation',
-                        'query_builder' => function(ReservationRepository $er) use ($reservataire)
+                        'choice_value' => 'NumeroOrdre',
+                        'query_builder' => function(ReservationRepository $er) use ($reservataire) 
                         {
                             return $er->myfindCodeR($reservataire);
                         }
@@ -60,8 +62,11 @@ class VolType extends AbstractType
         ->add('heureArrivee')
         ->add('valider', SubmitType::class, array('label' => 'Valider'))                
         ;
+   
     }
-    
+
+
+
     /**
      * {@inheritdoc}
      */
@@ -70,6 +75,7 @@ class VolType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'App\Entity\Vol',
             'reservataire' => null,
+           // 'realisation' => null,
         ));
     }
 

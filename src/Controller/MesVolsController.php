@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Controller;
+
+
+//use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -17,14 +20,14 @@ use App\Repository\VolRepository;
 use App\Entity\User;
 use Knp\Bundle\PaginatorBundle\KnpPaginatorBundle;
 use Knp\Component\Pager\PaginatorInterface;
+//use MercurySeries\FlashyBundle\FlashyNotifier;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use App\Entity\Reservation;
-use Symfony\Component\Form\Extension\Core\Type\EntityType;
 
 class MesVolsController extends AbstractController
 {
+
     // Method 2: via constructor
     //public function __construct(FlashyNotifier $flashy)
     //{
@@ -34,47 +37,56 @@ class MesVolsController extends AbstractController
     /**
      * @Route("/vol", name="app_MesVols")
      */	  
-    public function SaisirUnVolAction(Vol $vol = null, Request $request, ObjectManager $manager = null, OperationComptable $operation = null, Avions $avion = null, reservation $reservataire = null)
+
+    public function SaisirUnVolAction(Vol $vol = null,  Request $request, ObjectManager $manager = null, OperationComptable $operation = null, Avions $avion = null)
     {
-        $vol = new Vol();    
-        $user = $vol->setUser($this->container->get('security.token_storage')->getToken()->getUser());
-
-        $reservataire = $this->getUser('session')->getId();
+        $vol = new Vol();
+    
+        $vol->setUser($this->container->get('security.token_storage')->getToken()->getUser());
+    
+        $reservataire = $this->container->get('security.token_storage')->getToken()->getUser();        
+        
         $em = $this->getDoctrine()->getManager();
-        //$reservation = $em->getRepository('App\Entity\Reservation')->findBy(array('reservataire' => $reservataire)) ;
-        //$CodeReservation = $em->getRepository('App\Entity\Reservation')->myfindCodeR($reservataire);
 
-        $form = $this->createForm(VolType::class, $vol, array('reservataire' => $this->getUser()->getId() ) );
-     
+        $form = $this->createForm(VolType::class, $vol, array('reservataire' => $reservataire ));        
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $vol->setFacture($vol->getMontantFacture());
 
+            // Récupérer le code de réservation choisi dans le formulaire
+            $CodeReservation = $form->get('CodeReservation')->getData();
+
+            // Trouver la réservation correspondante en utilisant le Repository
+                // $reservation = $reservationRepository->findOneBy([
+                    //   'NumeroOrdre' => $CodeReservation
+                    //]);
+
+            // Mettre à jour l'attribut Realisation de la réservation
+            if ($CodeReservation) {
+                $CodeReservation->setRealisation(true);
+			}
+			
+            // Enregistrer les modifications dans la base de données
             $em = $this->getDoctrine()->getManager();
             $em->persist($vol);
             $em->flush();
-           // $request->getSession()->getFlashBag()->add('success', 'Le Vol a bien été enregistré.');
-            return $this->redirect($this->generateUrl('app_MesVols_confirmer', ['id' => $vol->getId(),
-                                                                                'avion' => $vol->getAvion('id'),
-                                                                                'Heuresdevol' => $vol->DureeDuVol(), 
-                                                                                //'CodeReservation' => $vol->getCodeReservation() 
-                                                                                ]
-                                                                            ));
-        }        
+
+            $request->getSession()->getFlashBag()->add('success', 'Le Vol a bien été enregistré.');
+
+            return $this->redirect($this->generateUrl('app_MesVols_confirmer', ['id' => $vol->getId(), 'avion' => $vol->getAvion('id'), 'Heuresdevol' => $vol->DureeDuVol(), ]));
+        }
+         
         return $this->render('/MesVols/saisir_Un_Vol.html.twig', [
             'formVol'    => $form->createView(),
             'editMode' => $vol->getId() !== null,
-            'reservataire' => $reservataire,
-            //'CodeReservation' => $CodeReservation,
-
+            'reservataire' =>$reservataire,
             ]);
     }
 
-
     /**
      * @Route("/confirmer/vol/{id}", name="app_MesVols_confirmer")
-     */	    
+     */	 
     public function ConfirmerUnVolAction(Vol $vol = null, Request $request, OperationComptable $operation = null, Avions $avion = null, $id)
     {
         $operation = new OperationComptable();
@@ -83,8 +95,8 @@ class MesVolsController extends AbstractController
         $operation->setOperMontant($vol->getMontantFacture());
         $operation ->setOperSensMt(0);
         $operation->setLibelle($vol->getLibelle());
+
 		$avion = $vol->getAvion('id');
-        $CodeReservation = $vol->setCodeReservation($vol->getCodeReservation() ) ;
 
         $em = $this->getDoctrine()->getManager();
 				
@@ -93,11 +105,18 @@ class MesVolsController extends AbstractController
 		$totalF = $vol->HeuresdeF();
 		$temps = $vol->DureeDuVol();
 		$totalFcellule = $vol->HeuresdeFcellule();
+        
+      //  echo 'heure cellule '.$totalFcellule;
+
 		$heure_1=$totalF;
-		$heure_1_1=$totalFcellule;              
-		$heure_2=$temps;						
+		$heure_1_1=$totalFcellule;
+      //  echo 'heure_1_1 '.$heure_1_1;                
+		$heure_2=$temps;
+	//	echo 'La somme de '.$heure_1.' et de '.$heure_2.' est: '.$vol->add_heures($heure_1,$heure_2); 
+						
 		$vol->getAvion('id')->setHeuresdeVol($vol->add_heures($heure_1,$heure_2) );
 		$vol->getAvion('id')->setHeuresCellule($vol->add_heures($heure_1_1,$heure_2) );
+
         $vol->setComptable($operation);
 
         if (null === $vol) {
@@ -112,6 +131,7 @@ class MesVolsController extends AbstractController
             $em->persist($operation);
             $em->persist($vol);
             $em->flush();
+
             $request->getSession()->getFlashBag()->add('Info', 'la facture est inscrite dans votre Cpte Pilote.');
             // $this->flashy->primaryDark('Vol enregistré !', 'http://your-awesome-link.com'); 
             return $this->redirectToRoute('sky_gestion_vols_detail', array('id' => $vol->getId()));
@@ -127,10 +147,11 @@ class MesVolsController extends AbstractController
 
      /**
      * @Route("/modifier/vol/{id}", name="sky_gestion_vol_modifier")
-     */	     
+     */	    
     public function ModifierUnVolAction($id, Request $request, OperationComptable $operation = null)
     {
         $em = $this->getDoctrine()->getManager();
+
         $vol = $em->getRepository('App\Entity\Vol')->find($id);
         $vol->setUser($this->container->get('security.token_storage')->getToken()->getUser());
 
@@ -163,9 +184,9 @@ class MesVolsController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($vol);
 
-            $form = $this->get('form.factory')->create(VolEditType::class, $vol);
+        $form = $this->get('form.factory')->create(VolEditType::class, $vol);
         
-            if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
+        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
 		//<-- Pour Enregistrer les nouvelles Heures de Fonction du moteur/cellule
@@ -180,13 +201,14 @@ class MesVolsController extends AbstractController
 				$heure_1=$totalF;
 				$heure_2=$temps;
 				$heure_1_1=$totalFcellule;				
-					
+			//	echo 'La somme de '.$heure_1.' et de '.$heure_2.' est: '.$vol->add_heures($heure_1,$heure_2); //
+		
 			// 4 - on enregistre les modifications	
 				$vol->getAvion('id')->setHeuresdeVol($vol->add_heures($heure_1,$heure_2));			
 				$vol->getAvion('id')->setHeuresCellule($vol->add_heures($heure_1_1,$heure_2));
 
-        //<-- Pour modifier HeureDepart/HeureArrivee/libelle/facture
-        //----------------------------------------------------------
+            //<-- Pour modifier HeureDepart/HeureArrivee/libelle/facture
+            //----------------------------------------------------------
             $vol->setFacture($vol->getMontantFacture());
 
             $operation = $vol->getComptable('id');
@@ -197,9 +219,11 @@ class MesVolsController extends AbstractController
 
             $em->persist($operation);		
             $em->flush();
+
             $request->getSession()->getFlashBag()->add('success', 'Le Vol a bien été modifié.');
             //$this->flashy->success('Vol modifié', 'http://your-awesome-link.com');
-			//$this->flashy->primaryDark('Vol Modifié !', 'http://your-awesome-link.com');                    
+			//$this->flashy->primaryDark('Vol Modifié !', 'http://your-awesome-link.com');        
+            
 			return $this->redirectToRoute('sky_gestion_vols_detail', array('id' => $vol->getId()));
         }
 
@@ -207,17 +231,21 @@ class MesVolsController extends AbstractController
             'vol' => $vol,
             'operation'=>$operation,
             'formVol'   => $form->createView(),
-            'editMode' => $vol->getId() !== null,          
+            'editMode' => $vol->getId() !== null,
+          
         ));
     }
 
+
      /**
      * @Route("/supprimer/vol/{id}", name="sky_gestion_vol_supprimer")
-     */	    
+     */	 
     public function SupprimerUnVolAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();
+
         $vol = $em->getRepository('App\Entity\Vol')->find(array('id'=>$id));
+
         $operation = $em->getRepository('App\Entity\OperationComptable')->find($id);
                     
         if (null === $vol) {
@@ -251,41 +279,55 @@ class MesVolsController extends AbstractController
         return $this->render('/MesVols/Supprimer_Un_Vol.html.twig', array(
             'vol' => $vol,
             'formVol'   => $form->createView(),
+            //'editMode' => $editMode,
         ));
     }
 
 
      /**
      * @Route("/vol/liste_des_vols", name="app_MesVols_liste")
-     */	    
+     */	
     public function listdesvolsAction(VolRepository $volsRepo, Request $request , PaginatorInterface $paginator)
     {
         // attributs de session
-        $user = $this->getUser('session')->getId();                
+        $user = $this->getUser('session')->getId();
+                
         $em = $this->getDoctrine()->getManager();
 
         $Vols = $volsRepo->findBy(
             array('user' => $user ),
             array('datevol' => 'desc')
-        );		
+        );
+		
         $vols  = $paginator->paginate(
             $Vols, 
             $request->query->getInt('page', 1),
             4 /* límite por página */
         );
+
+
+        //$vols  = $this->get('knp_paginator')->paginate(
+        //    $Vols,
+        //    $request->query->getInt('page', 1),
+        //    4
+        //);
+
         return $this->render('/MesVols/ListeVols.html.twig', array(
             'vols' => $vols,
+
         ));
     }
 
 
      /**
      * @Route("/vol/details_des_vols", name="sky_gestion_vols_detail")
-     */	      
+     */	
     public function detailsdesvolsAction(VolRepository $volsRepo, Request $request, PaginatorInterface $paginator)
     {
+
         // attributs de session
         $user = $this->getUser('session')->getId();
+
         $em=$this->getDoctrine()->getManager();
 
         $Vols = $volsRepo->findBy(
@@ -297,23 +339,31 @@ class MesVolsController extends AbstractController
             $Vols, 
             $request->query->getInt('page', 1), 
             4 
-        );                    
+        );        
+        //$vols  = $this->get('knp_paginator')->paginate(
+        //    $Vols,
+        //    $request->query->get('page', 1),
+        //    4
+        //);
+            
         return $this->render(
             '/MesVols/Details_des_Vols.html.twig',
             array('vols' => $vols,
             //'editMode' => "editMode",
-            )
+        )
         );
     }
 
 
       /**
      * @Route("/vol/pdf_list_vols", name="sky_PDFlistVols")
-     */	    
+     */	  
     public function PDFlistVolsAction( Request $request)
-    {   
+    {
+   
        // Configure Dompdf according to your needs
-        $pdfOptions = new Options();        
+        $pdfOptions = new Options();
+        
         $pdfOptions->set('defaultFont', 'Courier');
         
         // Instantiate Dompdf with our options
@@ -348,12 +398,13 @@ class MesVolsController extends AbstractController
 
     /**
     * @Route("/vol/pdf_detail_vols", name="sky_PDFlistDetailVols")
-    */	     
+    */	  
     public function PDFlistDetailVolsAction( Request $request)
     {
         
        // Configure Dompdf according to your needs
-        $pdfOptions = new Options();        
+        $pdfOptions = new Options();
+        
         $pdfOptions->set('defaultFont', 'Arial');
         
         // Instantiate Dompdf with our options
@@ -400,4 +451,9 @@ class MesVolsController extends AbstractController
         return new Response("The PDF file has been succesfully generated !");
     //
     }
+
+
+
+ 
+
 }

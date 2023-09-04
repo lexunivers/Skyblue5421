@@ -90,6 +90,28 @@ class Reservation
     */
     private $avion;
 
+//    /**
+//     * @var notification
+//     * @ORM\Column(name="notification", type="boolean", options={"default":false})
+//     */
+//    private $notification;    
+
+//    /**
+//     * @ORM\Column(name="CodeReservation", type="string", length=12)
+//     */
+//    private $CodeReservation;
+
+    /**
+     * @ORM\Column(name="realisation", type="boolean", options={"default":false} )
+     */
+    private $realisation;
+
+    /**
+     * @ORM\Column(name="NumeroOrdre",type="string", length=12)
+     */
+    private $NumeroOrdre;
+
+
     public function getAvion(): ?Avions
     {
         return $this->avion;
@@ -101,20 +123,6 @@ class Reservation
     
         return $this;
     }    
-
-    /**
-     * @ORM\Column(name="CodeReservation", type="string", length=5)
-     */
-    private $CodeReservation;
-
-
-
-
-    public function __construct()
-    {
-        $this->vols = new ArrayCollection();
-    }
-
     
     public function getStart(): ?\DateTimeInterface
     {
@@ -168,8 +176,8 @@ class Reservation
 
         $dureeduvol = date_diff($this->end,$this->start);
         return $dureeduvol->format('%H:%I');
-
     }
+
     public function getInstructeur(): ?Instructeur
     {
         return $this->instructeur;
@@ -233,30 +241,52 @@ class Reservation
     public function toString($object): string
     {
 
-        return $this->CodeReservation ;        
+        return $this->NumeroOrdre ;        
         return $object instanceof Reservation
             ? $object->getTitle()
             : 'Reservation'; // shown in the breadcrumb on the create view
     }
 
-    public function getCodeReservation(): ?string
-    {
-        return $this->CodeReservation;
-    }
+    //public function getCodeReservation(): ?string
+    //{
+    //    return $this->CodeReservation;
+    //}
 
-    public function setCodeReservation(string $CodeReservation): self
-    {
-        $this->CodeReservation = $CodeReservation;
+    //public function setCodeReservation(string $CodeReservation): self
+    //{
+    //    $this->CodeReservation = $CodeReservation;
 
-        return $this;
-    }
+    //    return $this;
+    //}
 
     public function __toString(): string
     {
 		  //return $this->facture;
-          return $this->CodeReservation ;
-
+          return $this->NumeroOrdre ;
 	}
 
+    public function isRealisation(): ?bool
+    {
+        return $this->realisation;
+    }
+
+    public function setRealisation(bool $realisation): self
+    {
+        $this->realisation = $realisation;
+
+        return $this;
+    }
+
+    public function getNumeroOrdre(): ?string
+    {
+        return $this->NumeroOrdre;
+    }
+
+    public function setNumeroOrdre(string $NumeroOrdre): self
+    {
+        $this->NumeroOrdre = $NumeroOrdre;
+
+        return $this;
+    }
   
 }

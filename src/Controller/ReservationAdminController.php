@@ -86,12 +86,18 @@ class ReservationAdminController extends Controller
                 $_SESSION['nom'] = $nom;
                 $_SESSION['prenom'] = $prenom;             
                 $_SESSION['instructeur'] = $instructeur;
-                $_SESSION['auteur'] = $auteur;                
-        
+                $_SESSION['auteur'] = $auteur;
+
+     
 			}
-        
+
+           // $staff = 1;
+            //$_SESSION['staff'] = $staff;
+
+            //var_dump($staff);
+           // exit;
             return $this->render('reservation_admin/index.html.twig', [
-            'form' => $form->createView(),             
+            'form' => $form->createView(),         
             ])
         ;
 
