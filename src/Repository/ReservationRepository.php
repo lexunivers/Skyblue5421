@@ -175,6 +175,7 @@ public function findByCodeReservation($reservataire)
         $qb = $this->createQueryBuilder('r');
          
         $qb->where('r.reservataire = :reservataire')
+           ->andWhere('r.realisation = false') 
            ->setParameter('reservataire', $reservataire);
         return $qb;
 		

@@ -57,6 +57,11 @@ class MesVolsController extends AbstractController
             // Récupérer le code de réservation choisi dans le formulaire
             $CodeReservation = $form->get('CodeReservation')->getData();
 
+
+
+            var_dump( $CodeReservation);
+           
+
             // Trouver la réservation correspondante en utilisant le Repository
                 // $reservation = $reservationRepository->findOneBy([
                     //   'NumeroOrdre' => $CodeReservation
@@ -65,8 +70,28 @@ class MesVolsController extends AbstractController
             // Mettre à jour l'attribut Realisation de la réservation
             if ($CodeReservation) {
                 $CodeReservation->setRealisation(true);
+                $CodeReservation->getAppareil();
+
+                var_dump($CodeReservation->getAppareil());
+                $avion = $form->get('avion')->getData();
+
+                $avion2 = $CodeReservation->getAppareil();
+                $appareil = $avion->getType();
+
 			}
-			
+           // var_dump($avion);
+           // var_dump($avion2);
+           // var_dump($appareil);
+
+           if ( $avion2 == $appareil ) {
+            
+                echo" Tout Bon ...!";
+            } else {
+                echo" Tout Faux ...!";
+                $request->getSession()->getFlashBag()->add('notice', 'appareil n\'est pas celui qui a été réservé. Modifiez en cliquant sur l\'icone');                
+            }
+            
+           // exit;
             // Enregistrer les modifications dans la base de données
             $em = $this->getDoctrine()->getManager();
             $em->persist($vol);
@@ -95,8 +120,8 @@ class MesVolsController extends AbstractController
         $operation->setOperMontant($vol->getMontantFacture());
         $operation ->setOperSensMt(0);
         $operation->setLibelle($vol->getLibelle());
-
-		$avion = $vol->getAvion('id');
+        		
+        $avion = $vol->getAvion('id');
 
         $em = $this->getDoctrine()->getManager();
 				
@@ -154,6 +179,7 @@ class MesVolsController extends AbstractController
 
         $vol = $em->getRepository('App\Entity\Vol')->find($id);
         $vol->setUser($this->container->get('security.token_storage')->getToken()->getUser());
+
 
         if (null === $vol) {
             throw new NotFoundHttpException("Le Vol d'id ".$id." n'existe pas.");
@@ -364,8 +390,10 @@ class MesVolsController extends AbstractController
        // Configure Dompdf according to your needs
         $pdfOptions = new Options();
         
-        $pdfOptions->set('defaultFont', 'Courier');
-        
+        $pdfOptions->set('defaultFont', 'Courier')->setChroot("C:\\wamp64\\www\\skyblue5421\\public");
+
+                
+
         // Instantiate Dompdf with our options
         $dompdf = new Dompdf($pdfOptions);
 
@@ -377,7 +405,7 @@ class MesVolsController extends AbstractController
         );
       
         // Retrieve the HTML generated in our twig file
-        $html = $this->renderView('MesVols/listV.html.twig', ['vols'=>$vols, 'user'=> $user ] ); 
+        $html = $this->renderView('MesVols/PDF_listeVols.html.twig', ['vols'=>$vols, 'user'=> $user ] ); 
      
         // Load HTML to Dompdf
         $dompdf->loadHtml($html);
@@ -389,7 +417,7 @@ class MesVolsController extends AbstractController
         $dompdf->render();
 
         // Output the generated PDF to Browser (force download)
-        $dompdf->stream("ListVols.pdf", [
+        $dompdf->stream("PDF_listeVols.pdf", [
             "Attachment" => true
         ]);        
 
@@ -405,7 +433,7 @@ class MesVolsController extends AbstractController
        // Configure Dompdf according to your needs
         $pdfOptions = new Options();
         
-        $pdfOptions->set('defaultFont', 'Arial');
+        $pdfOptions->set('defaultFont', 'Courier')->setChroot("C:\\wamp64\\www\\skyblue5421\\public");
         
         // Instantiate Dompdf with our options
         $dompdf = new Dompdf($pdfOptions);
@@ -418,7 +446,7 @@ class MesVolsController extends AbstractController
         );
       
         // Retrieve the HTML generated in our twig file
-        $html = $this->renderView('MesVols/listDetailVols.html.twig', ['vols'=>$vols, 'user'=>$user ] ); 
+        $html = $this->renderView('MesVols/PDF_DetailVols.html.twig', ['vols'=>$vols, 'user'=>$user ] ); 
      
         // Load HTML to Dompdf
         $dompdf->loadHtml($html);
@@ -430,7 +458,7 @@ class MesVolsController extends AbstractController
         $dompdf->render();
 
         // Output the generated PDF to Browser (force download)
-        $dompdf->stream("ListDetailVols.pdf", [
+        $dompdf->stream("PDF_DetailVols.pdf", [
             "Attachment" => true
         ]);        
 

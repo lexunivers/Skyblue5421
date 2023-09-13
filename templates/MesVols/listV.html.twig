@@ -1,6 +1,6 @@
 {% block body %}
 
-<body>
+<html>
 <style>
     * {
         font-family: DejaVu Sans, sans-serif;
@@ -38,7 +38,7 @@
         position: absolute;
         top: 0;
         left: -20px;
-        width: 120px;
+        width: 150px;
     }
     .logo_faculte{
         width: 120px;
@@ -63,21 +63,26 @@
         page-break-after: always;
     }
 </style>
+
+
+
+    {#<img src="C:\\wamp64\\www\\skyblue5421\\public\\img\\logo10.png">#}
+
 <body>
-	<img width="200px;" src="../public/img/logo10.png" alt="Mon logo8">
+	<img width="140px;" src="c:/wamp64/www/skyblue5421/public/img/logo10.png" alt="logo10">
 
 	<div class="row">
-
 		<h5>Compte de : {{app.user.firstname}} {{app.user.lastname}}</h5>	  
 		<h5>N° Pilote : {{app.user.id}} </h5>					
-		<h5>N°Comptable : {{app.user.comptepilote.id}}
-		
+		<h5>N°Comptable : {{app.user.comptepilote.id}} ICI ET LA !
+	
 
 	<div class="row">							
 		<div class="col-5">
 			<h3 align ="center">Liste de mes Vols au : {{'now'|format_datetime(locale='fr') }}</h3>
 		</div>
 	</div>
+
 				<table class="table_vol" cellspacing="0">
 					<thead>
 						<tr class="table-primary">
@@ -93,7 +98,7 @@
 						</tr>
 					</thead>					  
 							<tbody>							
-								{% for vol in vols%}
+								{% for vol in vols %}
 									<tr style="font-size:12px;color:#3774f7;">
 					   
 									   <td>{{ vol.user}}</td>
@@ -112,5 +117,6 @@
 	</div>
 </body>
 </html>
+
 
 {% endblock body %}

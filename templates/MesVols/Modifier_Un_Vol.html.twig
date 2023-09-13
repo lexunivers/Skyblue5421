@@ -41,7 +41,7 @@
 
 						{#	{% if editMode %} #}
 							<div class="alert alert-danger">
-							<h5><strong>Modification: Vérifiez les Données et le Montant de la Facture puis Validez</strong></h5>
+							<h5><strong>Modification: Saisissez les Nouvelles Données</strong></h5>
 							</div>
 						{#	{% else %}	#}
 							{#<h3>Rectifier Un Vol</h3> #}
@@ -121,7 +121,7 @@
 			<div class="form-group" style="font-weight: bold;font-size:medium;color:red">
 				{% if formVol.facture is defined %}
 				<div>{{ form_row(formVol.facture, {'label' : 'Facture portée sur votre compte:', 'attr' : { 'class' : 'vol' }}) }}</strong></div>					
-				{%endif %}
+				{%endif %} 
 				<div class="form-group" style="font-weight: bold;font-size:medium;color:blue">
 					<div>{{ form_row(formVol.dateOper, {'label' : 'Date de Saisie:', 'attr' : { 'class' : 'vol' }}) }}</strong></div>
 					</div>

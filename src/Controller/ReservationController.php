@@ -238,14 +238,7 @@ class ReservationController extends AbstractController
             $entityManager->persist($CodeAttribue);
             $entityManager->flush();
         }
-
-        
-        //$response = new Response(json_encode($stop));
-        //$response->headers->set('Content-Type', 'application/json');
-        //return $response;
-       // $form = $this->createForm(ReservationType::class, $reservation);
-        //$form->handleRequest($request);				
-
+			
             return $this->render('reservation_admin/index.html.twig', [
                // 'editMode' => $editMode,
                 'form' => $form->createView(),
@@ -431,33 +424,15 @@ class ReservationController extends AbstractController
 
                 $reservation = $em->getRepository('App\Entity\Reservation')->findBy(array('reservataire' => $reservataire), 
                                                                                        array('start' => 'ASC') ) ;
-
-            foreach ($reservation as $id => $valeur16) {
-           //     echo"ID 16 ICI: ".$valeur16->getId().'<br />'."\n";
-            } 
-
-            foreach ($reservation as $id => $valeur50) {
-                //echo"ID trouve ICI : ".$valeur50->getId().'<br />'."\n";
-            }            
-            $editMode = 1; 
-           // var_dump($value50);
-           // $value15->getId();
-
-          // for ($value15=0; $value15 ; $value15++) {
-            //    $value;
-           //}; 
-           //var_dump($value);
-           //var_dump($cle->getValeur50()->getId() );
-           // var_dump($reservation);
-          //  exit;               
-                   $reservation  = $paginator->paginate(
-                   $reservation, 
-                   $request->query->getInt('page', 1),
+              
+                $reservation  = $paginator->paginate(
+                $reservation, 
+                $request->query->getInt('page', 1),
                     5 /* límite por página */
                 );
-              //var_dump($value15);
+
                 return $this->render('/Reserver/show.html.twig', array(
-                  'reservation' => $reservation, 'editMode'=>$editMode,
+                  'reservation' => $reservation, //'editMode'=>$editMode,
               ));
         }    
 
