@@ -38,7 +38,8 @@
 						<th>Lieu Arrivee</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
 						<th>Heure Départ</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
 						<th>Heure Arrivée</th>                                                                                                                                                                                                            
-						<th>Durée Vol</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+						<th>Durée Vol</th>
+						{#<th>somme des vols</th>#}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 						<th>Tarif Solo</th>                                                                                                                                                                                                            
 						<th>Tarif Ecole</th>                                                                                                                                                                                                            
 						<th>Tarif Retenu</th>                                                                                                                                                                                                            
@@ -59,7 +60,10 @@
 							<td><detail>{{ vol.lieuarrivee}}</detail></td>
 							<td><detail>{{ vol.heuredepart|date('H:i') }}</detail></td>
 							<td><detail>{{ vol.heurearrivee|date('H:i')}}</detail></td>												
+							
 							<td><detail>{{ vol.dureeduvol |date('H:i') }}</detail></td>
+							
+						{#	<td><detail>{{ vol.totalHvol |date('H:i') }}</detail></td> #}
 							<td><detail>{{ vol.tarifSolo | number_format(2, '.', ',') }}</detail></td>									   
 							<td><detail>{{ vol.affichageEcole | number_format(2, '.', ',') }}</detail></td>								   
 							<td><detail>{{ vol.tarifapplicable | number_format(2, '.', ',') }}</detail></td> 	    

@@ -57,6 +57,7 @@ final class ReservationAdmin extends AbstractAdmin
             ->add('resourceId')
             ->add('reservataire')          
             ->add('instructeur')
+
             ;        
     }
 

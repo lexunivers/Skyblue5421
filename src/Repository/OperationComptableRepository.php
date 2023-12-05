@@ -31,7 +31,7 @@ class OperationComptableRepository extends ServiceEntityRepository
                  ->getOneOrNullResult();
     }
 
-    public function myFindSommeTotale($user)
+    public function myfindSommeTotale($user)
     {
         return $this->createQueryBuilder('O')
             ->select('O.CompteId,O.OperSensMt,SUM(O.OperMontant)')

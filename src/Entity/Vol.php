@@ -13,8 +13,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Table(name="vol")
  * @ORM\Entity(repositoryClass="App\Repository\VolRepository")
  * @UniqueEntity(fields={"datevol", "user", "heureDepart", "heureArrivee"  }, message="Cet vol est déjà enregistré") 
- * @ORM\Entity
-
  */
  
 class Vol
@@ -261,7 +259,7 @@ class Vol
     private $dateOper;
 
     /**
-     * @ORM\Column(name="CodeReservation",type="string", length=7)
+     * @ORM\Column(name="CodeReservation",type="string", length=7, nullable=true)
      */
     private $CodeReservation;
 
@@ -283,6 +281,7 @@ class Vol
     public function __construct()
     {
         $this->dateOper = new \DateTime('now');
+       
     }
 
     public function getDateOper(): ?\DateTimeInterface
@@ -381,6 +380,8 @@ class Vol
         return $HeuresdeFcellule;
     }    
     
+
+
     // A - Elements à récupérer pour le calcul du montant à facturer au Pilote
     //------------------------------------------------------------------------
 
@@ -391,6 +392,17 @@ class Vol
         $dureeduvol = date_diff($this->heureDepart, $this->heureArrivee);
         return $dureeduvol->format('%H:%I:%S');
     }
+
+    public function totalHvol(){
+        $duree = $this->DureeDuVol('H:I');
+        $tempsdeVol = strtotime($duree);
+        //$totalHvol = new \DateTime('now');       
+        //$sommedureedesvols = date_diff($this->heureDepart, $this->heureArrivee)  ;
+        $totalHvol = $tempsdeVol; 
+        return $totalHvol;
+    }
+
+
       
     // -2/- Tarif Applicable selon le type de vol "Solo" ou "Ecole" //
     

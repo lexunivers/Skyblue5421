@@ -34,6 +34,8 @@ class MonCompteController extends AbstractController
         $sommeTotale =$em->getRepository('App\Entity\OperationComptable')->myfindSommeTotale($user);
         $montantdebit = $em->getRepository('App\Entity\OperationComptable')->myFindDebit($user);
         $montantcredit = $em->getRepository('App\Entity\OperationComptable')->myFindCredit($user);
+
+ 
         
         return $this->render('/MonCompte/Situation_Compte.html.twig', array(
             'pagination' => $paginator->paginate(

@@ -26,6 +26,7 @@
 						  <th>Instructeur</th>
 						  <th>Nature</th>						  
 						  <th>Durée</th>
+
 						  <th>Tarif</th>					  
 						  <th>Débit €uros</th>
 						</tr>
@@ -40,6 +41,7 @@
 								<td style="font-weight: bold;color:#446e9b;">{{ vol.instructeur }}</td>
 								<td style="font-weight: bold;color:#446e9b;">{{ vol.naturevol}}</td>									   
 								<td style="font-weight: bold;color:#446e9b;">{{ vol.dureeduvol | date('H:i') }}</td>
+
 								<td style="font-weight: bold;color:#446e9b;">{{ vol.tarifapplicable | number_format(2, '.', ',') }}</td>
 								<td style="font-weight: bold;color:#446e9b;">{{ vol.montantfacture | number_format(2, '.', ',') }}</td>
 							</tr>

@@ -104,7 +104,7 @@ class Avions
     /**
      * @var string
      *
-     * @ORM\Column(name="heuresCellule", type="string", nullable=true)
+     * @ORM\Column(name="heuresCellule", type="string")
      */
     private $heuresCellule;
 

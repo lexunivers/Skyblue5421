@@ -66,7 +66,7 @@ final class VolAdmin extends AbstractAdmin
 
             ->add('validation', FieldDescriptionInterface::TYPE_BOOLEAN, ['label' =>'Validé ? ','editable' => true])
             ->add('user.comptepilote.id', null, array('label'=>'N° cptable'))
-            ->add('CodeReservation',null, ['label'=>'Code'])
+            ->add('CodeReservation',null, ['label'=>'Code Bur'])
 			->add(ListMapper::NAME_ACTIONS, null, [
 				'actions' => [
 					'show' => [],
@@ -76,8 +76,9 @@ final class VolAdmin extends AbstractAdmin
 			]);
     }
 
-    protected function configureFormFields(FormMapper $form): void
+    protected function configureFormFields(FormMapper $form, ): void
     {
+        $reservataire = ['reservataire'];
         $form
 		
              ->with('Pilote', ['class' => 'col-md-3','box_class'=> 'box box-solid box-primary'])
@@ -95,11 +96,10 @@ final class VolAdmin extends AbstractAdmin
 
             ->with('Données du Vol', ['class' => 'col-md-4','box_class'=> 'box box-solid box-success'])
 				->add('datevol', null, ['label'=>'Date du Vol' ])
-                ->add('CodeReservation',null, ['label'=>'CodeReservation',
-                                     //'class' => 'App\Entity\Vol',
-                                     //'required' => true 
-                                     ])
+                ->add('CodeReservation', null, ['label'=>'Code Bureau 9999' ])
 
+
+                
                 ->add('avion',null, ['label'=>'Avion',
                                      'class' => 'App\Entity\Avions',
                                      'required' => true ])												 

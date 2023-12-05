@@ -57,11 +57,8 @@ class MesVolsController extends AbstractController
             // Récupérer le code de réservation choisi dans le formulaire
             $CodeReservation = $form->get('CodeReservation')->getData();
 
-
-
             var_dump( $CodeReservation);
-           
-
+//exit;
             // Trouver la réservation correspondante en utilisant le Repository
                 // $reservation = $reservationRepository->findOneBy([
                     //   'NumeroOrdre' => $CodeReservation
@@ -83,13 +80,13 @@ class MesVolsController extends AbstractController
            // var_dump($avion2);
            // var_dump($appareil);
 
-           if ( $avion2 == $appareil ) {
+         //  if ( $avion2 == $appareil ) {
             
-                echo" Tout Bon ...!";
-            } else {
-                echo" Tout Faux ...!";
-                $request->getSession()->getFlashBag()->add('notice', 'appareil n\'est pas celui qui a été réservé. Modifiez en cliquant sur l\'icone');                
-            }
+           //     echo" Tout Bon ...!";
+           // } else {
+           //     echo" Tout Faux ...!";
+           //     $request->getSession()->getFlashBag()->add('notice', 'appareil n\'est pas celui qui a été réservé. Modifiez en cliquant sur l\'icone');                
+           // }
             
            // exit;
             // Enregistrer les modifications dans la base de données
@@ -135,13 +132,17 @@ class MesVolsController extends AbstractController
 
 		$heure_1=$totalF;
 		$heure_1_1=$totalFcellule;
-      //  echo 'heure_1_1 '.$heure_1_1;                
+        echo 'heure_1_1 '.$heure_1_1;
+        
+        var_dump($heure_1_1);
+        var_dump($heure_1);
+    
 		$heure_2=$temps;
-	//	echo 'La somme de '.$heure_1.' et de '.$heure_2.' est: '.$vol->add_heures($heure_1,$heure_2); 
+		echo 'La somme de '.$heure_1.' et de '.$heure_2.' est: '.$vol->add_heures($heure_1,$heure_2); 
 						
 		$vol->getAvion('id')->setHeuresdeVol($vol->add_heures($heure_1,$heure_2) );
 		$vol->getAvion('id')->setHeuresCellule($vol->add_heures($heure_1_1,$heure_2) );
-
+      //  exit;
         $vol->setComptable($operation);
 
         if (null === $vol) {
@@ -311,6 +312,71 @@ class MesVolsController extends AbstractController
 
 
      /**
+     * @Route("/vol/carnetDeVols", name="app_MesVols_carnet")
+     */	
+    public function carnetDeVols(Vol $vol = null, VolRepository $volsRepo, Request $request , PaginatorInterface $paginator)
+    {
+        // attributs de session
+        $user = $this->getUser('session')->getId();               
+        $em = $this->getDoctrine()->getManager();
+        $vols = $em->getRepository('App\Entity\Vol')->findAll();
+
+        $monTempsSolo = $em->getRepository('App\Entity\Vol')->myDureeTotaleSolo($user);
+
+        $monTempsDouble = $em->getRepository('App\Entity\Vol')->myDureeTotaleDouble($user);
+
+        $monTempsGlobal = $em->getRepository('App\Entity\Vol')->myDureeTotaleGlobal($user);
+
+
+        foreach ($monTempsSolo as $value1) {
+            $value1;
+
+        };
+
+        foreach ($monTempsDouble as $value2) {
+            $value2;
+        };
+
+        foreach ($monTempsGlobal as $value3) {
+            $value3;
+        };
+
+        
+
+    if (strlen($value1)  || (strlen($value2)  || (strlen($value3) >= 5) ) )  {
+        $string = $value1;
+        $heure = $string[0].":".$string[1].$string[2];//.":".$string[4];
+
+        $string2 = $value2;
+        $heure1 = "0".$string2[0].":".$string2[1].$string[3];//.":".$string2[4];        
+        
+        $string3 = $value3;
+        $heure2 = $string3[0].$string3[1].":".$string[1].$string3[3];           
+
+        }else{
+
+   echo" tout faux";
+        };
+
+
+        $Vols = $volsRepo->findBy(array('user' => $user ),array('datevol' => 'desc') );
+		
+        $vols  = $paginator->paginate(
+            $Vols, 
+            $request->query->getInt('page', 1),
+            8 /* límite par page */
+        );
+
+        return $this->render('/MesVols/carnetDeVols.html.twig', array(
+            'vols' => $vols,
+            'monTempsSolo' =>$heure,
+            'monTempsDouble' =>$heure1,
+            'monTempsGlobal' =>$heure2,
+           // 'sommeDureeVol' =>[$sommeDureeVol],
+        ));
+    }    
+
+     /**
      * @Route("/vol/liste_des_vols", name="app_MesVols_liste")
      */	
     public function listdesvolsAction(VolRepository $volsRepo, Request $request , PaginatorInterface $paginator)
@@ -328,7 +394,7 @@ class MesVolsController extends AbstractController
         $vols  = $paginator->paginate(
             $Vols, 
             $request->query->getInt('page', 1),
-            4 /* límite por página */
+            7 /* límite por página */
         );
 
 
@@ -358,7 +424,8 @@ class MesVolsController extends AbstractController
 
         $Vols = $volsRepo->findBy(
             array('user'=> $user),
-            array('datevol' => 'desc')
+            array('datevol' => 'desc'),
+
         );
 
         $vols  = $paginator->paginate(

@@ -5,6 +5,10 @@
 
 		{% include "_partials/_entete.html.twig" %}
 <section >
+
+
+
+
   <div class="container py-5" style="background-color:#436c99;">
     <div class="row">    
       <div class="col-lg-4">
@@ -157,11 +161,10 @@
 							<a button class="btn btn-danger" role="button" href="{{ path('user_profile_modifier') }}">Modifier</a>
 						{% endif %}
 					{% endif %}				
-							<a button class="btn btn-primary" role="button" aria-pressed="true" href="{{ path('app_MesDossiers') }}">Mes Dossiers</a>
+							<a button class="btn btn-primary" role="button" aria-pressed="true" href="{{ path('app_MesDossiers') }}">Dossiers</a>
+              <a button class="btn btn-primary" role="button" aria-pressed="true" href="{{ path('app_mes_docs') }}">Mes Docs</a>
 				</p>
 
-    </div>
-  </div>
 </section>	
 			
 		

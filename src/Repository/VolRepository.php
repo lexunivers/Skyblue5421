@@ -21,10 +21,88 @@ class VolRepository extends ServiceEntityRepository
     }
 
 
-//SELECT (v.CodeReservation) as CodeDsVol, (v.User_id) as Pilote,(r.CodeReservation) as CodeDsReservation FROM `vol`v, reservation r WHERE v.CodeReservation = r.CodeReservation;     
+    public function myfindMonTemps(){
+        return $this->createQueryBuilder('v') 
+        ->SELECT('SUM(DATE_DIFF(v.heureDepart, v.heureArrivee)) as SommeDuree')
+        //->FROM ('App\Entity\Vol', 'v')
+        ->WHERE ('v.typevol = 2')
+        ->andWhere(' v.user = 3')
+        ->getQuery()
+        ->getSingleResult()
+        ;
+    }        
+
+	
 
 
 
+    public function myfindTemps()
+	{
+    $queryBuilder = $this->createQueryBuilder('v')
+                 ->select('SUM(v.heureDepart - v.heureArrivee) as SommeDuree') 
+                 //->from('App\Entity\Vol', 'v')
+                 ->where('v.typevol = 1')
+                 ->andWhere('v.user = 3');
+
+    $sommeDuree = $queryBuilder->getQuery()->getSingleResult();
+    return $queryBuilder;
+    }
+
+public function myDureeTotaleSolo($user){
+    return $this->createQueryBuilder('v')    
+    ->Select('SUM(v.heureArrivee - v.heureDepart) as SommeDureeSolo')
+    ->where('v.typevol = 1') 
+    ->andWhere('v.user =:user')
+    ->setParameter('user',$user)
+    //->GROUPBY ('DureeDuVol' ) 
+    ->getQuery()
+    ->getSingleResult(); 
+}
+
+
+public function myDureeTotaleDouble($user){
+    return $this->createQueryBuilder('v')
+    //->select('v.id, v.typevol, v.heureDepart, v.heureArrivee, v.User_id, date_diff(v.heureDepart, v.heureArrivee) ')
+    ->Select('SUM(v.heureArrivee - v.heureDepart) as SommeDureeDouble')
+    ->Where('v.typevol = 2')
+    ->andWhere('v.user =:user')
+    ->setParameter('user',$user)
+    //->orderBy('TIMEDIFF(heureDepart, heureArrivee)' )
+    //->GROUPBY('SUM(date_DIFF(v.heureDepart,v.heureArrivee) )' )   
+    ->getQuery()
+    ->getSingleResult()
+    
+;
+}    
+
+public function myDureeTotaleGlobal($user){
+    return $this->createQueryBuilder('v')
+    //->select('v.id, v.typevol, v.heureDepart, v.heureArrivee, v.User_id, date_diff(v.heureDepart, v.heureArrivee) ')
+    ->Select('SUM(v.heureArrivee - v.heureDepart) as SommeDureeGlobale')
+    //->Where('v.typevol = 2')
+    ->Where('v.user =:user')
+    ->setParameter('user',$user)
+    //->orderBy('TIMEDIFF(heureDepart, heureArrivee)' )
+    //->GROUPBY('SUM(date_DIFF(v.heureDepart,v.heureArrivee) )' )   
+    ->getQuery()
+    ->getSingleResult()
+    
+;
+}
+
+//$sommeTotale =$em->getRepository('App\Entity\OperationComptable')->myfindSommeTotale($user);
+
+public function myfindSommeTotale($user)
+{
+    return $this->createQueryBuilder('V')
+        ->select('V.CompteId,SUM(V.dureevol)')
+        ->Where('v.CompteId = :CompteId')
+        ->setParameter('CompteId', $user)
+        ->GROUPBY('V.dureevol')
+        ->getQuery()
+        ->getResult()
+    ;
+}
 
 public function findByUser($user)
 {

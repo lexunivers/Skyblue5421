@@ -17,6 +17,7 @@ doctrine:
                 alias: App
                # type: attribute
 
+
 when@test:
     doctrine:
         dbal:
